@@ -2,14 +2,20 @@
 
 // Variables from the VAO
 in vec3 position;
+// Texture mapping from the vertex
+in vec2 textureCoords;
 
 // Output to fragment shader
-out vec3 colour;
+// VARIABLE NAMES MATTER!
+//out vec3 colour;
+out vec2 pass_textureCoords;
 
 void main(void) {
 	
 	// Set position of vertex
 	gl_Position = vec4(position, 1.0);
 	// Set a color for the processed vertex
-	colour = vec3(position.x+0.5, 1.0, position.y+0.5);
+	//colour = vec3(position.x+0.5, 1.0, position.y+0.5);
+	// Lineair assign vertex coords to texture coords
+	pass_textureCoords = textureCoords;
 }

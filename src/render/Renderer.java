@@ -6,8 +6,11 @@ package render;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
+import model.Model;
+import model.TexturedModel;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
@@ -21,6 +24,12 @@ public class Renderer {
 	 * VAO at index 0
 	 */
 	public final static int POSITION_ATTR_INDEX = 0;
+	
+	/**
+	 * This variable declares that texture coordinate mappings will be stored inside the
+	 * VAO at index 1
+	 */
+	public final static int TEXTURE_COORD_ATTR_INDEX = 1;
 	
 	/**
 	 * 
@@ -46,13 +55,20 @@ public class Renderer {
 	 * 
 	 * @param model
 	 */
-	public void render( Model model )
+	public void render( TexturedModel model )
 	{
 		/* Bind all resources */
 		// Bind the VAO attached to this model
 		GL30.glBindVertexArray(model.getVoaID());
 		// Enable the list with INDEX 0 from the VAO
 		GL20.glEnableVertexAttribArray(POSITION_ATTR_INDEX);
+		// Enable texture coords
+		GL20.glEnableVertexAttribArray(TEXTURE_COORD_ATTR_INDEX);
+		
+		// Activate the first texture bank, the 2DSampler (Shader) uses this one
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		// Set the active texture for the following draw
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, model.getTexture().getTextureID());
 		
 		/* The drawArray function is replaced with the drawElements function */
 		// Tell OpenGL to draw the vertices defined inside the activated VBO's
@@ -70,7 +86,10 @@ public class Renderer {
 		
 		/* Unbind all used resources */
 		// Unbind the position VBO
-		GL20.glDisableVertexAttribArray(0);
+		GL20.glDisableVertexAttribArray(POSITION_ATTR_INDEX);
+		// Unbind texture coords
+		GL20.glDisableVertexAttribArray(TEXTURE_COORD_ATTR_INDEX);
+		
 		// Unbind the chosen VAO
 		GL30.glBindVertexArray(0);
 	}

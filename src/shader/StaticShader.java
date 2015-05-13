@@ -3,6 +3,8 @@
  */
 package shader;
 
+import render.Renderer;
+
 /**
  * @author Bert
  */
@@ -35,7 +37,9 @@ public class StaticShader extends ShaderProgram {
 	protected void bindAttributes()
 	{
 		// Connect the position VBO (from the VAO at INDEX 0) to the variable position
-		super.bindAttribute(0, "position");
+		super.bindAttribute(Renderer.POSITION_ATTR_INDEX, "position");
+		// Connect the texture coords VBO
+		super.bindAttribute(Renderer.TEXTURE_COORD_ATTR_INDEX, "textureCoords");
 		
 	}
 	

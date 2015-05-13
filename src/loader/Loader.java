@@ -3,18 +3,19 @@
  */
 package loader;
 
+import java.io.InputStream;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+
+import model.Model;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-
-import render.Model;
 import render.Renderer;
 
 /**
@@ -33,6 +34,11 @@ public class Loader {
 	private List<Integer> vboIDS;
 	
 	/**
+	 * Contains all the DI's of the loaded textures
+	 */
+	private List<Integer> textureIDS;
+	
+	/**
 	 * Constructor
 	 */
 	public Loader()
@@ -40,6 +46,7 @@ public class Loader {
 		// Init
 		vaoIDS = new ArrayList<>();
 		vboIDS = new ArrayList<>();
+		textureIDS = new ArrayList<>();
 	}
 	
 	/**
@@ -58,7 +65,15 @@ public class Loader {
 		{
 			GL30.glDeleteVertexArrays(vbo);
 		}
+		
+		// Cleanup textures
+		for (int texture : textureIDS)
+		{
+			GL11.glDeleteTextures(texture);
+		}
 	}
+	
+	// ------------------------------------------------------------------------
 	
 	/**
 	 * Generates a model containing the VAO which is used to store the model properties
@@ -66,7 +81,7 @@ public class Loader {
 	 * @param positions
 	 * @return
 	 */
-	public Model loadToVAO( float[] positions, int[] indices )
+	public Model loadToVAO( float[] positions, float[] textureCoords, int[] indices )
 	{
 		// Create new VAO
 		int vaoID = createVAO();
@@ -75,7 +90,9 @@ public class Loader {
 		GL30.glBindVertexArray(vaoID);
 		
 		// Store the positions inside the VAO, INDEX 0
-		storeDataInVAO(Renderer.POSITION_ATTR_INDEX, positions);
+		storeDataInVAO(Renderer.POSITION_ATTR_INDEX, 3, positions);
+		// Store the texture coord mappings inside the VAO, INDEX 1
+		storeDataInVAO(Renderer.TEXTURE_COORD_ATTR_INDEX, 2, textureCoords);
 		
 		// Store the indices into the VAO
 		bindIndicesBuffer(indices);
@@ -85,7 +102,7 @@ public class Loader {
 		
 		/* The vertex count is replaced with indices.length */
 		// Count the amount of defined vertices
-		//int vertexCount = positions.length / 3;
+		// int vertexCount = positions.length / 3;
 		
 		// Generate a new Model
 		return new Model(vaoID, indices.length);
@@ -108,12 +125,21 @@ public class Loader {
 	}
 	
 	/**
+	 * Releases the active VAO
+	 */
+	private void unbindVAO()
+	{
+		// 0 releases the currently bind VAO
+		GL30.glBindVertexArray(0);
+	}
+	
+	/**
 	 * Stores an object array into the propertieslist of the VAO at the given index
 	 * 
 	 * @param VAOIndex
 	 * @param data
 	 */
-	private void storeDataInVAO( int VAOIndex, float[] data )
+	private void storeDataInVAO( int VAOIndex, int coordSize, float[] data )
 	{
 		/*
 		 * Create a VBO
@@ -139,13 +165,13 @@ public class Loader {
 		/*
 		 * Store the VBO inside the VAO
 		 * Store the VBO inside the VAO at VAOIndex
-		 * Each vertex consists of 3 floats
+		 * Each pair consists of coordSize floats
 		 * The data is a FLOAT
 		 * The data is NOT NORMALIZED
 		 * 0 defines the amount of floats between each vertex
 		 * 0 defines the offset from where the data starts
 		 */
-		GL20.glVertexAttribPointer(VAOIndex, 3, GL11.GL_FLOAT, false, 0, 0);
+		GL20.glVertexAttribPointer(VAOIndex, coordSize, GL11.GL_FLOAT, false, 0, 0);
 		// Unbind the VBO
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 	}
@@ -166,17 +192,53 @@ public class Loader {
 		// Get the intbuffer from the data
 		IntBuffer buffer = storeDataInIntBuffer(indices);
 		// Store the buffer data into the created VBO
-		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);		
+		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
+	}
+	
+	// ------------------------------------------------------------------------
+	
+	/**
+	 * Fetches the inputstream of a specific object
+	 * 
+	 * @param file The path to the object, separated with forward slashes
+	 * @return
+	 */
+	private InputStream loadSource( String file )
+	{
+		InputStream input = Thread.currentThread()
+				.getContextClassLoader()
+				.getResourceAsStream(file);
+		
+		if ( input == null )
+		{
+			System.err.println("Couldn't load the texture");
+		}
+		
+		return input;
 	}
 	
 	/**
-	 * Releases the active VAO
+	 * Loads a specified texture into the memory
+	 * 
+	 * @param fileName
+	 * @return
 	 */
-	private void unbindVAO()
+	public int loadTexture( String fileName )
 	{
-		// 0 releases the currently bind VAO
-		GL30.glBindVertexArray(0);
+		int textureID = 0;
+		
+		// Load the texture
+		TextureLoader textLoad = new TextureLoader(this.loadSource(fileName));
+		// Get the texture id
+		textureID = textLoad.loadTexture();
+		// Save the id
+		textureIDS.add(textureID);
+		
+		// Return the texture id
+		return textureID;
 	}
+	
+	// ------------------------------------------------------------------------
 	
 	/**
 	 * Transfroms a regulary java floatarray to a full fledged floatbuffer

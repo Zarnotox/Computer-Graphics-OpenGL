@@ -1,7 +1,7 @@
 /**
  * 
  */
-package render;
+package model;
 
 /**
  * @author Bert

@@ -11,6 +11,8 @@ import static org.lwjgl.system.MemoryUtil.*;
 import java.nio.ByteBuffer;
 
 import loader.Loader;
+import model.Model;
+import model.TexturedModel;
 
 import org.lwjgl.glfw.GLFWCharCallback;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -19,9 +21,9 @@ import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 
-import render.Model;
 import render.Renderer;
 import shader.StaticShader;
+import texture.ModelTexture;
 import callbacks.CharHandler;
 import callbacks.KeyHandler;
 
@@ -88,7 +90,6 @@ public class OpenGLStart {
 		
 		// The handler for char events
 		charCallback = new CharHandler();
-		
 	}
 	
 	/**
@@ -181,21 +182,39 @@ public class OpenGLStart {
 		StaticShader stShader = new StaticShader();
 		
 		// A model
-		float[] vertices = { 
-				/* First vertex */
-				0.5f, -0.5f, 0f, 
-				/* Second vertex */
-				-0.5f, -0.5f, 0f, 
-				/* Third vertex */
-				-0.5f, 0.5f, 0f };
+		float[] vertices = {
+		/* First vertex */
+		-0.5f, 0.5f, 0f,
+		/* Second vertex */
+		-0.5f, -0.5f, 0f,
+		/* Third vertex */
+		0.5f, -0.5f, 0f,
+		/* Fourth vertex */
+		0.5f, 0.5f, 0 };
 		
 		// The index telling in what order to draw
 		int[] indices = {
-				0, 1, 2
-		};
+		/* First */
+		0, 1, 3,
+		/* Second */
+		3, 1, 2 };
+		
+		// Texture coord mappings
+		float[] textureCoords = {
+				// SW
+				0, 0,
+				// NW
+				0, 1,
+				// NE
+				1, 1,
+				// SE
+				1, 0 };
 		
 		// Create the model
-		Model model = loader.loadToVAO(vertices, indices);
+		Model model = loader.loadToVAO(vertices, textureCoords, indices);
+		ModelTexture texture = new ModelTexture(
+				loader.loadTexture("res/squareTexture.png")); // trans_test.png
+		TexturedModel texturedModel = new TexturedModel(model, texture);
 		
 		// Loop till the user wants to close the window
 		while (glfwWindowShouldClose(window) == GL_FALSE)
@@ -206,7 +225,7 @@ public class OpenGLStart {
 			stShader.start();
 			
 			// Render the model
-			renderer.render(model);
+			renderer.render(texturedModel);
 			
 			// Stop the shader program
 			stShader.stop();

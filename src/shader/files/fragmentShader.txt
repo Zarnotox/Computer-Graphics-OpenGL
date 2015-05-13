@@ -1,12 +1,16 @@
 #version 400 core
 
 // input from the vertexShader
-in vec3 colour;
+// VARIABLE NAMES MATTER!
+in vec2 pass_textureCoords;
 
 // output the color of the pixel
 out vec4 out_colour;
 
+// The object that contains a lineair sampling algorithm
+uniform sampler2D textureSampler;
+
 void main(void) {
-	// Set the color for each processed pixel
-	out_colour = vec4(colour, 1.0);
+	// Sample the texture pixel on the model
+	out_colour = texture(textureSampler, pass_textureCoords);
 }
