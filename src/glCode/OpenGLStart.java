@@ -7,10 +7,10 @@ import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
-import glCode.callbacks.CharHandler;
-import glCode.callbacks.KeyHandler;
 
 import java.nio.ByteBuffer;
+
+import loader.Loader;
 
 import org.lwjgl.glfw.GLFWCharCallback;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -18,6 +18,11 @@ import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
+
+import render.Model;
+import render.Renderer;
+import callbacks.CharHandler;
+import callbacks.KeyHandler;
 
 /**
  * OpenGL initialisation class based on the HelloWorld example found on the LWJGL website
@@ -165,13 +170,33 @@ public class OpenGLStart {
 		// Set the base values of the color buffers
 		glClearColor(0, 0, 0, 0);
 		
+		// Create a new Loader
+		Loader loader = new Loader();
+		// Create a new Renderer
+		Renderer renderer = new Renderer();
+		
+		// a model
+		float[] vertices = { 
+				/* First vertex */
+				0.5f, -0.5f, 0f, 
+				/* Second vertex */
+				-0.5f, -0.5f, 0f, 
+				/* Third vertex */
+				-0.5f, 0.5f, 0f };
+		
+		// Create the model
+		Model model = loader.loadToVAO(vertices);
+		
 		// Loop till the user wants to close the window
 		while (glfwWindowShouldClose(window) == GL_FALSE)
 		{
-			// Clear the color and depth buffers
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			// Prepare for rendering the scene
+			renderer.prepare();
 			
 			// Process things
+			
+			// Render the model
+			renderer.render(model);
 			
 			// Swap the buffer / show the rendered stuff
 			glfwSwapBuffers(window);
@@ -179,6 +204,9 @@ public class OpenGLStart {
 			// Poll for events, interrupts and such get handled
 			glfwPollEvents();
 		}
+		
+		/* CLEANUP */
+		loader.cleanUp();
 		
 	}
 }

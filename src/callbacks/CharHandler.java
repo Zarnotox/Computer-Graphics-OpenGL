@@ -1,7 +1,7 @@
 /**
  * 
  */
-package glCode.callbacks;
+package callbacks;
 
 import org.lwjgl.glfw.GLFWCharCallback;
 
