@@ -1,0 +1,12 @@
+#version 400 core
+
+// input from the vertexShader
+in vec3 colour;
+
+// output the color of the pixel
+out vec4 out_colour;
+
+void main(void) {
+	// Set the color for each processed pixel
+	out_colour = vec4(colour, 1.0);
+}

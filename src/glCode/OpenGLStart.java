@@ -21,6 +21,7 @@ import org.lwjgl.opengl.GLContext;
 
 import render.Model;
 import render.Renderer;
+import shader.StaticShader;
 import callbacks.CharHandler;
 import callbacks.KeyHandler;
 
@@ -175,6 +176,10 @@ public class OpenGLStart {
 		// Create a new Renderer
 		Renderer renderer = new Renderer();
 		
+		/* SHADERS */
+		// Create static shader
+		StaticShader stShader = new StaticShader();
+		
 		// A model
 		float[] vertices = { 
 				/* First vertex */
@@ -197,11 +202,14 @@ public class OpenGLStart {
 		{
 			// Prepare for rendering the scene
 			renderer.prepare();
-			
-			// Process things
+			// Run shader
+			stShader.start();
 			
 			// Render the model
 			renderer.render(model);
+			
+			// Stop the shader program
+			stShader.stop();
 			
 			// Swap the buffer / show the rendered stuff
 			glfwSwapBuffers(window);
@@ -211,6 +219,10 @@ public class OpenGLStart {
 		}
 		
 		/* CLEANUP */
+		// Cleanup shader resources
+		stShader.cleanUp();
+		
+		// Cleanup buffers (VAO/VBO)
 		loader.cleanUp();
 		
 	}
