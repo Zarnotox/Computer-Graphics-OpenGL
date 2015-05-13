@@ -213,7 +213,7 @@ public class OpenGLStart {
 		// Create the model
 		Model model = loader.loadToVAO(vertices, textureCoords, indices);
 		ModelTexture texture = new ModelTexture(
-				loader.loadTexture("res/squareTexture.png")); // trans_test.png
+				loader.loadTexture("res/trans_test.png")); // trans_test.png
 		TexturedModel texturedModel = new TexturedModel(model, texture);
 		
 		// Loop till the user wants to close the window

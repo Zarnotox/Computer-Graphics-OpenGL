@@ -73,32 +73,34 @@ public class TextureLoader {
 		ByteBuffer buffer = null;
 		
 		/* DEBUG */
-		//System.out.println("Got " + byteArray.length + " bytes");
+		System.out.println("Got " + byteArray.length + " bytes");
 		// print four first bytes
-		/*
 		System.out.println(Byte.toUnsignedInt(byteArray[0]));
 		System.out.println(Byte.toUnsignedInt(byteArray[1]));
 		System.out.println(Byte.toUnsignedInt(byteArray[2]));
 		System.out.println(Byte.toUnsignedInt(byteArray[3]));
-		*/
 		
 		// Switch on the amount of bytes per pixel in the bytearray
 		if ( bytesPerPixel == BYTES_PER_PIXEL_RGBA )
 		{
 			System.out.println("4Bytes");
+			
+			buffer = BufferUtils.createByteBuffer(image.getHeight()
+					* image.getHeight() * BYTES_PER_PIXEL_RGBA);
+			
 			// Copy all data into the bytebuffer
-			/*for (int i = 0; i < byteArray.length; i = i + BYTES_PER_PIXEL_RGBA)
+			for (int i = 0; i < byteArray.length; i = i + BYTES_PER_PIXEL_RGBA)
 			{
 				buffer.put(byteArray[i + 3]); // RED
 				buffer.put(byteArray[i + 2]); // GREEN
 				buffer.put(byteArray[i + 1]); // BLUE
-				buffer.put(byteArray[i]); // Alpha				
-			}*/
+				buffer.put(byteArray[i]); // Alpha (normalized)				
+			}
 			
 			// NEW
-			buffer = ByteBuffer.allocateDirect(byteArray.length);
+			/*buffer = ByteBuffer.allocateDirect(byteArray.length);
 			buffer.order(ByteOrder.nativeOrder());
-			buffer.put(byteArray, 0, byteArray.length);	
+			buffer.put(byteArray, 0, byteArray.length);*/	
 			
 		}
 		else if ( bytesPerPixel == BYTES_PER_PIXEL_RGB )
@@ -174,6 +176,9 @@ public class TextureLoader {
 		{
 			// Create bufferedimage
 			img = ImageIO.read(imageData);
+			
+			// Close stream
+			imageData.close();
 		}
 		catch (IOException e)
 		{
