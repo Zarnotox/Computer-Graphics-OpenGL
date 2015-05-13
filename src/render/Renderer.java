@@ -54,8 +54,19 @@ public class Renderer {
 		// Enable the list with INDEX 0 from the VAO
 		GL20.glEnableVertexAttribArray(POSITION_ATTR_INDEX);
 		
+		/* The drawArray function is replaced with the drawElements function */
 		// Tell OpenGL to draw the vertices defined inside the activated VBO's
-		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, model.getVertexCount());
+		// GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, model.getVertexCount());
+		
+		/*
+		 * Draw the model to the scene
+		 * Draw Triangles
+		 * Draw amount of vertices
+		 * We are referring to the indices, so look for Unsigned Ints
+		 * 0 offset
+		 */
+		GL11.glDrawElements(GL11.GL_TRIANGLES, model.getVertexCount(),
+				GL11.GL_UNSIGNED_INT, 0);
 		
 		/* Unbind all used resources */
 		// Unbind the position VBO

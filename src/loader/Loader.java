@@ -4,6 +4,7 @@
 package loader;
 
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,14 +45,17 @@ public class Loader {
 	/**
 	 * Disposes all the acquired resources
 	 */
-	public void cleanUp() {
+	public void cleanUp()
+	{
 		// Cleanup all created VAO's
-		for(int vao: vaoIDS) {
+		for (int vao : vaoIDS)
+		{
 			GL30.glDeleteVertexArrays(vao);
 		}
 		
 		// Cleanup all created VBO's
-		for(int vbo: vboIDS) {
+		for (int vbo : vboIDS)
+		{
 			GL30.glDeleteVertexArrays(vbo);
 		}
 	}
@@ -62,7 +66,7 @@ public class Loader {
 	 * @param positions
 	 * @return
 	 */
-	public Model loadToVAO( float[] positions )
+	public Model loadToVAO( float[] positions, int[] indices )
 	{
 		// Create new VAO
 		int vaoID = createVAO();
@@ -73,14 +77,18 @@ public class Loader {
 		// Store the positions inside the VAO, INDEX 0
 		storeDataInVAO(Renderer.POSITION_ATTR_INDEX, positions);
 		
+		// Store the indices into the VAO
+		bindIndicesBuffer(indices);
+		
 		// Unbind the VAO
 		unbindVAO();
 		
+		/* The vertex count is replaced with indices.length */
 		// Count the amount of defined vertices
-		int vertexCount = positions.length / 3;
+		//int vertexCount = positions.length / 3;
 		
 		// Generate a new Model
-		return new Model(vaoID, vertexCount);
+		return new Model(vaoID, indices.length);
 	}
 	
 	/**
@@ -121,15 +129,15 @@ public class Loader {
 		// Convert the given data into a FloatBuffer
 		FloatBuffer dataBuffer = storeDataInFloatBuffer(data);
 		
-		/* Add the buffer tot the VBO
-		 * 
+		/*
+		 * Add the buffer tot the VBO
 		 * The data is an Array
 		 * STATIC_DRAW means the data won't change, just draw it
 		 */
 		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, dataBuffer, GL15.GL_STATIC_DRAW);
 		
-		/* Store the VBO inside the VAO
-		 * 
+		/*
+		 * Store the VBO inside the VAO
 		 * Store the VBO inside the VAO at VAOIndex
 		 * Each vertex consists of 3 floats
 		 * The data is a FLOAT
@@ -138,8 +146,27 @@ public class Loader {
 		 * 0 defines the offset from where the data starts
 		 */
 		GL20.glVertexAttribPointer(VAOIndex, 3, GL11.GL_FLOAT, false, 0, 0);
-		// Unbind the VBO 
+		// Unbind the VBO
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+	}
+	
+	/**
+	 * Put the given indices (Vertex iterate data) into the used VAO
+	 * 
+	 * @param indices
+	 */
+	private void bindIndicesBuffer( int[] indices )
+	{
+		// Create new VBO
+		int vboID = GL15.glGenBuffers();
+		// Save buffer id
+		vboIDS.add(vboID);
+		// Bind the created buffer as an element buffer
+		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboID);
+		// Get the intbuffer from the data
+		IntBuffer buffer = storeDataInIntBuffer(indices);
+		// Store the buffer data into the created VBO
+		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);		
 	}
 	
 	/**
@@ -153,15 +180,35 @@ public class Loader {
 	
 	/**
 	 * Transfroms a regulary java floatarray to a full fledged floatbuffer
+	 * 
 	 * @param data
 	 * @return
 	 */
-	private FloatBuffer storeDataInFloatBuffer(float[] data) {
+	private FloatBuffer storeDataInFloatBuffer( float[] data )
+	{
 		// Generate a new buffer
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
 		// Put the data
 		buffer.put(data);
 		// Flipping the buffer says we are done filling it
+		buffer.flip();
+		// Return the buffer
+		return buffer;
+	}
+	
+	/**
+	 * Transforms a regularly java intarray to a full fledged floatbuffer
+	 * 
+	 * @param data
+	 * @return
+	 */
+	private IntBuffer storeDataInIntBuffer( int[] data )
+	{
+		// Create new buffer
+		IntBuffer buffer = BufferUtils.createIntBuffer(data.length);
+		// Put the data
+		buffer.put(data);
+		// Flip the buffer to end it
 		buffer.flip();
 		// Return the buffer
 		return buffer;

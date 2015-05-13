@@ -175,7 +175,7 @@ public class OpenGLStart {
 		// Create a new Renderer
 		Renderer renderer = new Renderer();
 		
-		// a model
+		// A model
 		float[] vertices = { 
 				/* First vertex */
 				0.5f, -0.5f, 0f, 
@@ -184,8 +184,13 @@ public class OpenGLStart {
 				/* Third vertex */
 				-0.5f, 0.5f, 0f };
 		
+		// The index telling in what order to draw
+		int[] indices = {
+				0, 1, 2
+		};
+		
 		// Create the model
-		Model model = loader.loadToVAO(vertices);
+		Model model = loader.loadToVAO(vertices, indices);
 		
 		// Loop till the user wants to close the window
 		while (glfwWindowShouldClose(window) == GL_FALSE)
