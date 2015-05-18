@@ -4,6 +4,8 @@
 package shader;
 
 import camera.Camera;
+import light.Light;
+import loader.Loader;
 import math.Maths;
 import math.matrix.Matrix4f;
 import render.Renderer;
@@ -16,12 +18,12 @@ public class StaticShader extends ShaderProgram {
 	/**
 	 * Location of the vertex shader file
 	 */
-	private static final String VERTEX_SHADER_FILE = "src/shader/files/vertexShader.txt";
+	private static final String VERTEX_SHADER_FILE = "shader/files/vertexShader.txt";
 	
 	/**
 	 * Location of the fragment shader file
 	 */
-	private static final String FRAGMENT_SHADER_FILE = "src/shader/files/fragmentShader.txt";
+	private static final String FRAGMENT_SHADER_FILE = "shader/files/fragmentShader.txt";
 	
 	/**
 	 * The location of the shader variable transformationMatrix
@@ -39,12 +41,22 @@ public class StaticShader extends ShaderProgram {
 	private int location_viewMatrix;
 	
 	/**
+	 * The location of the shader variable lightPosition
+	 */
+	private int location_lightPosition;
+	
+	/**
+	 * The location of the shader variable lightColour
+	 */
+	private int location_lightColour;
+	
+	/**
 	 * Constructor
 	 */
-	public StaticShader()
+	public StaticShader(Loader loader)
 	{
 		// Let the super class handle the shader files
-		super(VERTEX_SHADER_FILE, FRAGMENT_SHADER_FILE);
+		super(VERTEX_SHADER_FILE, FRAGMENT_SHADER_FILE, loader);
 	}
 	
 	/*
@@ -58,6 +70,8 @@ public class StaticShader extends ShaderProgram {
 		super.bindAttribute(Renderer.POSITION_ATTR_INDEX, "position");
 		// Connect the texture coords VBO
 		super.bindAttribute(Renderer.TEXTURE_COORD_ATTR_INDEX, "textureCoords");
+		// Connect the normals VBO to the VAO
+		super.bindAttribute(Renderer.NORMALS_ATTR_INDEX, "normal");
 		
 	}
 	
@@ -71,6 +85,8 @@ public class StaticShader extends ShaderProgram {
 		location_transformationMatrix = super.getUniformVarLocation("transformationMatrix");
 		location_projectionMatrix = super.getUniformVarLocation("projectionMatrix");
 		location_viewMatrix = super.getUniformVarLocation("viewMatrix");
+		location_lightColour = super.getUniformVarLocation("lightColour");
+		location_lightPosition = super.getUniformVarLocation("lightPosition");
 	}
 	
 	/**
@@ -104,6 +120,17 @@ public class StaticShader extends ShaderProgram {
 		Matrix4f matrix = Maths.createViewMatrix(camera);
 		// Store the viewmatrix
 		super.loadMatrix(location_viewMatrix, matrix);
+	}
+	
+	/**
+	 * Loads a light object into the shader
+	 * @param light
+	 */
+	public void loadLight(Light light) {
+		// Load the position of the light
+		super.loadVector(location_lightPosition, light.getPosition());
+		// Load the colour of the light
+		super.loadVector(location_lightColour, light.getColor());
 	}
 	
 }

@@ -11,7 +11,9 @@ import static org.lwjgl.system.MemoryUtil.*;
 import java.awt.Dimension;
 import java.nio.ByteBuffer;
 
+import light.Light;
 import loader.Loader;
+import loader.OBJLoader;
 import math.vector.Vector3f;
 import model.Model;
 import model.TexturedModel;
@@ -64,6 +66,11 @@ public class OpenGLStart {
 	private RenderResources res;
 	
 	/**
+	 * The object that handles loading resources
+	 */
+	private Loader loader;
+	
+	/**
 	 * Constructor
 	 */
 	public OpenGLStart()
@@ -84,10 +91,12 @@ public class OpenGLStart {
 		// Get the current context from GLFW
 		GLContext.createFromCurrent();
 		
+		// Create a new Loader
+		this.loader = new Loader();
 		
 		/* SHADERS */
 		// Create static shader
-		StaticShader stShader = new StaticShader();
+		StaticShader stShader = new StaticShader(loader);
 		// Load additional shaders
 		loadShaders();
 		
@@ -97,6 +106,9 @@ public class OpenGLStart {
 		/* CAMERAS */
 		res.setActiveCamera(new MovableCamera(new Vector3f(0, 0, 0), 0, 0, 0));
 		res.addCamera(new MovableCamera(new Vector3f(0, 0, 5), 0, 0, 0));
+		
+		/* LIGHTS */
+		res.addLight(new Light(new Vector3f(0, -10, -5), new Vector3f(0.8f, 0.8f, 0.7f)));
 		
 		// Generate Keyhandlers
 		initInputhandlers();
@@ -217,51 +229,18 @@ public class OpenGLStart {
 	{
 		System.out.println("Running loop");
 		
-		// Set the base values of the color buffers
-		glClearColor(0, 0, 0, 0);
-		
-		// Create a new Loader
-		Loader loader = new Loader();
 		// Create a new Renderer
 		Renderer renderer = new Renderer(windowHelper, res.getStShader());
 		
-		// A model
-		float[] vertices = {
-		/* First vertex */
-		-0.5f, 0.5f, 0f,
-		/* Second vertex */
-		-0.5f, -0.5f, 0f,
-		/* Third vertex */
-		0.5f, -0.5f, 0f,
-		/* Fourth vertex */
-		0.5f, 0.5f, 0 };
-		
-		// The index telling in what order to draw
-		int[] indices = {
-		/* First */
-		0, 1, 3,
-		/* Second */
-		3, 1, 2 };
-		
-		// Texture coord mappings
-		float[] textureCoords = {
-				// SW
-				0, 0,
-				// NW
-				0, 1,
-				// NE
-				1, 1,
-				// SE
-				1, 0 };
-		
 		// Create the model
-		Model model = loader.loadToVAO(vertices, textureCoords, indices);
+		Model model = OBJLoader.loadObjModel("res/dragon.obj", loader);
 		// Load the texture
-		ModelTexture texture = new ModelTexture(loader.loadTexture("res/trans_test.png")); // trans_test.png
+		ModelTexture texture = new ModelTexture(
+				loader.loadTexture("res/squareTexture_flatColour.png")); // trans_test.png
 		// Link model and texture
 		TexturedModel texturedModel = new TexturedModel(model, texture);
 		// Generate an entity from the model and texture
-		Entity entity = new Entity(texturedModel, new Vector3f(0, 0, -2), 0, 0, 0, 1);
+		Entity entity = new Entity(texturedModel, new Vector3f(0, -5, -15), 0, 0, 0, 1);
 		
 		// Loop till the user wants to close the window
 		while (glfwWindowShouldClose(windowHelper.getHandle()) == GL_FALSE)

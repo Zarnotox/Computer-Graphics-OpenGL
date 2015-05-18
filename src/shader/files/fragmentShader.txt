@@ -3,14 +3,32 @@
 // input from the vertexShader
 // VARIABLE NAMES MATTER!
 in vec2 pass_textureCoords;
+// The normal of this surface
+in vec3 surfaceNormal;
+// The vector towards the light
+in vec3 toLightVector;
 
 // output the color of the pixel
 out vec4 out_colour;
 
 // The object that contains a lineair sampling algorithm
 uniform sampler2D textureSampler;
+uniform vec3 lightColour;
 
 void main(void) {
+
+	// Normalize vectors first
+	vec3 unitNormal = normalize(surfaceNormal);
+	vec3 unitLightVector = normalize(toLightVector);
+	
+	// Calculate dotproduct of both vectors
+	float nDot1 = dot(unitNormal, unitLightVector);
+	// We want no black spots
+	float brightness = max(nDot1, 0.2);
+	// Calculate the light diffuse strength
+	vec3 diffuse = brightness * lightColour;
+	
 	// Sample the texture pixel on the model
-	out_colour = texture(textureSampler, pass_textureCoords);
+	// Merge the light colour with the texture
+	out_colour = vec4(diffuse, 1.0) * texture(textureSampler, pass_textureCoords);
 }

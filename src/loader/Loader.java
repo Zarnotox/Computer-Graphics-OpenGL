@@ -81,7 +81,10 @@ public class Loader {
 	 * @param positions
 	 * @return
 	 */
-	public Model loadToVAO( float[] positions, float[] textureCoords, int[] indices )
+	public Model loadToVAO( float[] positions,
+			float[] textureCoords,
+			float[] normals,
+			int[] indices )
 	{
 		// Create new VAO
 		int vaoID = createVAO();
@@ -93,6 +96,8 @@ public class Loader {
 		storeDataInVAO(Renderer.POSITION_ATTR_INDEX, 3, positions);
 		// Store the texture coord mappings inside the VAO, INDEX 1
 		storeDataInVAO(Renderer.TEXTURE_COORD_ATTR_INDEX, 2, textureCoords);
+		// Store the texture coord mappings inside the VAO, INDEX 1
+		storeDataInVAO(Renderer.NORMALS_ATTR_INDEX, 3, normals);
 		
 		// Store the indices into the VAO
 		bindIndicesBuffer(indices);
@@ -203,7 +208,7 @@ public class Loader {
 	 * @param file The path to the object, separated with forward slashes
 	 * @return
 	 */
-	private InputStream loadSource( String file )
+	public InputStream loadSource( String file )
 	{
 		InputStream input = Thread.currentThread()
 				.getContextClassLoader()
@@ -211,7 +216,7 @@ public class Loader {
 		
 		if ( input == null )
 		{
-			System.err.println("Couldn't load the texture");
+			System.err.println("Couldn't load the resource");
 		}
 		
 		return input;

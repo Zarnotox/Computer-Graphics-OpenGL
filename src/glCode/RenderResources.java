@@ -6,6 +6,7 @@ package glCode;
 import java.util.ArrayList;
 import java.util.List;
 
+import light.Light;
 import shader.ShaderProgram;
 import shader.StaticShader;
 import camera.Camera;
@@ -14,6 +15,8 @@ import camera.Camera;
  * @author Bert
  */
 public class RenderResources {
+	
+	/* SHADERS */
 	
 	/**
 	 * The static shader
@@ -25,6 +28,8 @@ public class RenderResources {
 	 */
 	private List<ShaderProgram> shaderList;
 	
+	/* CAMERAS */
+	
 	/**
 	 * List of created camera's
 	 */
@@ -35,6 +40,12 @@ public class RenderResources {
 	 */
 	private int currentCamera;
 	
+	/* LIGHTS */
+	/**
+	 * List of created lights
+	 */
+	private List<Light> lightList;
+	
 	/**
 	 * Constructor
 	 */
@@ -43,8 +54,9 @@ public class RenderResources {
 		
 		this.stShader = shader;
 		
-		// Generate a camer list
+		// Generate lists
 		cameraList = new ArrayList<>();
+		lightList = new ArrayList<>();
 	}
 	
 	/**
@@ -65,6 +77,15 @@ public class RenderResources {
 	public void addShader( ShaderProgram shader )
 	{
 		shaderList.add(shader);
+	}
+	
+	/**
+	 * Add a light to the render
+	 * @param light
+	 */
+	public void addLight( Light light )
+	{
+		this.lightList.add(light);
 	}
 	
 	/**
@@ -100,7 +121,7 @@ public class RenderResources {
 	 */
 	public void nextCamera()
 	{
-		if ( currentCamera >= (cameraList.size()-1) )
+		if ( currentCamera >= (cameraList.size() - 1) )
 		{
 			currentCamera = 0;
 		}
@@ -110,7 +131,7 @@ public class RenderResources {
 		}
 		
 		/* DEBUG */
-		//System.out.println("Registering camera: " + currentCamera);
+		// System.out.println("Registering camera: " + currentCamera);
 	}
 	
 	/**
@@ -128,7 +149,7 @@ public class RenderResources {
 		}
 		
 		/* DEBUG */
-		//System.out.println("Registering camera: " + currentCamera);
+		// System.out.println("Registering camera: " + currentCamera);
 	}
 	
 	/**
@@ -137,7 +158,7 @@ public class RenderResources {
 	 * @return
 	 */
 	public Camera getActiveCamera()
-	{		
+	{
 		return cameraList.get(currentCamera);
 	}
 	
@@ -163,6 +184,14 @@ public class RenderResources {
 	public List<Camera> getCameraList()
 	{
 		return new ArrayList<>(cameraList);
+	}
+	
+	/**
+	 * @return the lightList
+	 */
+	public List<Light> getLightList()
+	{
+		return this.lightList;
 	}
 	
 }

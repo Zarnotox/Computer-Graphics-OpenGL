@@ -41,6 +41,12 @@ public class Renderer {
 	public final static int TEXTURE_COORD_ATTR_INDEX = 1;
 	
 	/**
+	 * This variable declares that normal vectors will be stored inside the
+	 * VAO at index 2
+	 */
+	public final static int NORMALS_ATTR_INDEX = 2;
+	
+	/**
 	 * The field of view angle used for the camera
 	 */
 	public final static float FOV = 70;
@@ -92,8 +98,8 @@ public class Renderer {
 		// Clear the color and depth buffers
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		// Clear the scene
-		GL11.glClearColor(1, 0, 0, 1);
+		// Set the base values of the color buffers
+		GL11.glClearColor(0.2f, 0, 0, 1);
 	}
 	
 	/**
@@ -103,11 +109,14 @@ public class Renderer {
 	 */
 	public void render( Entity entity, RenderResources res )
 	{
-		/* Run shader */
-		res.getStShader().start();
-		
 		// Fetch the model from the entity
 		TexturedModel model = entity.getModel();
+		
+		// Fetch the static shader
+		StaticShader staticShader = res.getStShader();
+		
+		/* Run shader */
+		staticShader.start();
 		
 		/* Bind all resources */
 		// Bind the VAO attached to this model
@@ -116,11 +125,16 @@ public class Renderer {
 		GL20.glEnableVertexAttribArray(POSITION_ATTR_INDEX);
 		// Enable texture coords
 		GL20.glEnableVertexAttribArray(TEXTURE_COORD_ATTR_INDEX);
+		// Enable normals
+		GL20.glEnableVertexAttribArray(NORMALS_ATTR_INDEX);
+		
+		/* LIGHT MANIPULATION */
+		staticShader.loadLight(res.getLightList().get(0));
 		
 		/* CAMERA MANIPULATION */
-		res.getStShader().loadviewMatrix(res.getActiveCamera());
+		staticShader.loadviewMatrix(res.getActiveCamera());
 		
-		/* POSITION MANIPULATION */		
+		/* POSITION MANIPULATION */
 		// Create transformation matrix for the object
 		Matrix4f transformationMatrix = Maths.createTransformationMatrix(
 				entity.getPosition(), entity.getRotationX(), entity.getRotationY(),
@@ -148,12 +162,14 @@ public class Renderer {
 		GL20.glDisableVertexAttribArray(POSITION_ATTR_INDEX);
 		// Unbind texture coords
 		GL20.glDisableVertexAttribArray(TEXTURE_COORD_ATTR_INDEX);
+		// Unbind the normals
+		GL20.glDisableVertexAttribArray(NORMALS_ATTR_INDEX);
 		
 		// Unbind the chosen VAO
 		GL30.glBindVertexArray(0);
 		
 		/* Stop the shader program */
-		res.getStShader().stop();
+		staticShader.stop();
 	}
 	
 	/**

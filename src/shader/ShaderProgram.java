@@ -3,12 +3,16 @@
  */
 package shader;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
+import loader.Loader;
 import math.matrix.Matrix4f;
 import math.vector.Vector3f;
 
@@ -47,13 +51,13 @@ public abstract class ShaderProgram {
 	 * @param vertexFile
 	 * @param fragmentFile
 	 */
-	public ShaderProgram( String vertexFile, String fragmentFile )
+	public ShaderProgram( String vertexFile, String fragmentFile, Loader loader )
 	{
 		try
 		{
 			// Compile the shaders
-			vertexShaderID = loadShader(vertexFile, GL20.GL_VERTEX_SHADER);
-			fragmentShaderID = loadShader(fragmentFile, GL20.GL_FRAGMENT_SHADER);
+			vertexShaderID = loadShader(vertexFile, GL20.GL_VERTEX_SHADER, loader);
+			fragmentShaderID = loadShader(fragmentFile, GL20.GL_FRAGMENT_SHADER, loader);
 			
 			// Create the shader program
 			programID = GL20.glCreateProgram();
@@ -158,11 +162,21 @@ public abstract class ShaderProgram {
 	 * @return
 	 * @throws IOException
 	 */
-	private static int loadShader( String file, int type )
+	private static int loadShader( String file, int type, Loader loader )
 			throws IOException
 	{
-		// Load the file content
-		List<String> lines = Files.readAllLines(Paths.get(file));
+		// Read the file
+		InputStreamReader inReader = new InputStreamReader(loader.loadSource(file));
+		
+		// Create a buffered reader for the file content
+		BufferedReader reader = new BufferedReader(inReader);
+		List<String> lines = new ArrayList<>();
+		
+		String line;
+		while((line = reader.readLine()) != null) {
+			lines.add(line);
+		}
+			
 		// Concat everything
 		String collectedLines = String.join("\n", lines);
 		
@@ -238,7 +252,8 @@ public abstract class ShaderProgram {
 		// Flip the buffer
 		MAT4FBuffer.flip();
 		// Load the buffer into OpenGL
-		/* The id of the memory location
+		/*
+		 * The id of the memory location
 		 * False means the buffer was filled in Column Major Order
 		 * The buffer itself
 		 */
