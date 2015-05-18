@@ -8,13 +8,16 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
+import java.awt.Dimension;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 import loader.Loader;
 import math.vector.Vector3f;
 import model.Model;
 import model.TexturedModel;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWCharCallback;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
@@ -37,7 +40,7 @@ import entity.Entity;
 public class OpenGLStart {
 	
 	// Window handle
-	private long window;
+	private DisplayHelper windowHelper;
 	
 	// Errorhandler
 	private GLFWErrorCallback errorHandler;
@@ -73,7 +76,7 @@ public class OpenGLStart {
 		loop();
 		
 		// Release all resources
-		glfwDestroyWindow(window);
+		glfwDestroyWindow(windowHelper.getHandle());
 		releaseInputHandlers();
 		
 		// Close up the application
@@ -135,30 +138,38 @@ public class OpenGLStart {
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 		
 		// Get the windowhandle
-		window = glfwCreateWindow(windowWidth, windowHeight, windowTitle, NULL, NULL);
+		long windowHandle = glfwCreateWindow(windowWidth, windowHeight, windowTitle, NULL, NULL);
 		// Check the handle
-		if ( window == NULL )
+		if ( windowHandle == NULL )
 		{
 			throw new RuntimeException("Could not create the GLFW window");
 		}
 		
 		/* SETUP KEY LISTENERS */
-		glfwSetKeyCallback(window, keyCallback);
-		glfwSetCharCallback(window, charCallback);
+		glfwSetKeyCallback(windowHandle, keyCallback);
+		glfwSetCharCallback(windowHandle, charCallback);
+		
+		// Generate a displayhelper object for the created window
+		windowHelper = new DisplayHelper(windowHandle);
+		
+		/* Get the real dimensions of the window */
+		Dimension d = windowHelper.getWindowDimensions();
+		windowWidth = (int) d.getWidth();
+		windowHeight = (int) d.getHeight();
 		
 		// Fetch the graphical details of the primary monitor
 		ByteBuffer videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		int centerWidth = (GLFWvidmode.width(videoMode) - windowWidth) / 2;
 		int centerHeight = (GLFWvidmode.height(videoMode) - windowHeight) / 2;
 		// Center the created window
-		glfwSetWindowPos(window, centerWidth, centerHeight);
+		glfwSetWindowPos(windowHandle, centerWidth, centerHeight);
 		
 		// Create the OpenGL context
-		glfwMakeContextCurrent(window);
+		glfwMakeContextCurrent(windowHandle);
 		// Enable v-sync
 		glfwSwapInterval(1); // Swap buffer on every framepush
 		// Make the window visible
-		glfwShowWindow(window);
+		glfwShowWindow(windowHandle);
 	}
 	
 	/**
@@ -174,14 +185,14 @@ public class OpenGLStart {
 		// Set the base values of the color buffers
 		glClearColor(0, 0, 0, 0);
 		
-		// Create a new Loader
-		Loader loader = new Loader();
-		// Create a new Renderer
-		Renderer renderer = new Renderer();
-		
 		/* SHADERS */
 		// Create static shader
 		StaticShader stShader = new StaticShader();
+		
+		// Create a new Loader
+		Loader loader = new Loader();
+		// Create a new Renderer
+		Renderer renderer = new Renderer(windowHelper, stShader);
 		
 		// A model
 		float[] vertices = {
@@ -214,15 +225,15 @@ public class OpenGLStart {
 		
 		// Create the model
 		Model model = loader.loadToVAO(vertices, textureCoords, indices);
-		ModelTexture texture = new ModelTexture(
-				loader.loadTexture("res/trans_test.png")); // trans_test.png
+		// Load the texture
+		ModelTexture texture = new ModelTexture(loader.loadTexture("res/trans_test.png")); // trans_test.png
+		// Link model and texture
 		TexturedModel texturedModel = new TexturedModel(model, texture);
-		
 		// Generate an entity from the model and texture
-		Entity entity =  new Entity(texturedModel, new Vector3f(0, 0, 0), 0, 0, 0, 1);
+		Entity entity = new Entity(texturedModel, new Vector3f(0, 0, -2), 0, 0, 0, 1);
 		
 		// Loop till the user wants to close the window
-		while (glfwWindowShouldClose(window) == GL_FALSE)
+		while (glfwWindowShouldClose(windowHelper.getHandle()) == GL_FALSE)
 		{
 			// Prepare for rendering the scene
 			renderer.prepare();
@@ -230,7 +241,7 @@ public class OpenGLStart {
 			stShader.start();
 			
 			// Update entity
-			//entity.increasePosition(0.05f, 0, 0);
+			//entity.increasePosition(0, 0, -0.005f);
 			entity.increaseRotation(0, 1, 0);
 			// Render the model
 			renderer.render(entity, stShader);
@@ -239,7 +250,7 @@ public class OpenGLStart {
 			stShader.stop();
 			
 			// Swap the buffer / show the rendered stuff
-			glfwSwapBuffers(window);
+			glfwSwapBuffers(windowHelper.getHandle());
 			
 			// Poll for events, interrupts and such get handled
 			glfwPollEvents();

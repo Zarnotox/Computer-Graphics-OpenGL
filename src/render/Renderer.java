@@ -6,9 +6,11 @@ package render;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
+
+import java.awt.Dimension;
+
 import math.Maths;
 import math.matrix.Matrix4f;
-import model.Model;
 import model.TexturedModel;
 
 import org.lwjgl.opengl.GL11;
@@ -18,6 +20,7 @@ import org.lwjgl.opengl.GL30;
 
 import shader.StaticShader;
 import entity.Entity;
+import glCode.DisplayHelper;
 
 /**
  * @author Bert
@@ -36,11 +39,47 @@ public class Renderer {
 	 */
 	public final static int TEXTURE_COORD_ATTR_INDEX = 1;
 	
+	
+	
+	/**
+	 * The field of view angle used for the camera
+	 */
+	public final static float FOV = 70;
+	
+	/**
+	 * The minimum distance for things to be visible
+	 */
+	public final static float NEAR_PLANE_DISTANCE = 0.1f;
+	
+	/**
+	 * The distance as in how far away we can see
+	 */
+	public final static float FAR_PLANE_DISTANCE = 1000;
+	
+	/**
+	 * Object that makes window properties more accessible
+	 */
+	private DisplayHelper displayHelper;
+	
+	/**
+	 * Matrix that transforms our view of the scene
+	 */
+	private Matrix4f projectionMatrix;
+	
 	/**
 	 * 
 	 */
-	public Renderer()
+	public Renderer(DisplayHelper displayHelper, StaticShader shader)
 	{
+		this.displayHelper = displayHelper;
+		
+		// Generate the projectionMatrix
+		createProjectionMatrix();
+		
+		// Load the projectionMatrix straight into the shader
+		shader.start();
+		shader.loadProjectionMatrix(projectionMatrix);
+		shader.stop();
 	}
 	
 	/**
@@ -102,5 +141,36 @@ public class Renderer {
 		
 		// Unbind the chosen VAO
 		GL30.glBindVertexArray(0);
+	}
+	
+	/**
+	 * Generate a projectionMatrix.
+	 * The projectionMatrix makes the objects onscreen more realistic looking
+	 */
+	private void createProjectionMatrix() {
+		// Fetch the window dimensions
+		Dimension d = displayHelper.getWindowDimensions();
+		
+		/* DEBUG */
+		System.out.println("Calculating projection matrix");
+		System.out.println("WindowDimensions: " + d.toString());
+		
+		// Prepare matrix variables
+		float aspectRatio = (float) d.getWidth() / (float) d.getHeight();
+		float y_scale = (float) (1f / Math.tan(Math.toRadians(FOV/ 2f)) * aspectRatio);
+		float x_scale = y_scale / aspectRatio;
+		float frustum_length = FAR_PLANE_DISTANCE - NEAR_PLANE_DISTANCE;
+		
+		// Generate the projection matrix
+		projectionMatrix = new Matrix4f();
+		projectionMatrix.m00 = x_scale;
+		projectionMatrix.m11 = y_scale;
+		projectionMatrix.m22 = -((FAR_PLANE_DISTANCE + NEAR_PLANE_DISTANCE) / frustum_length);
+		projectionMatrix.m23 = -1;
+		projectionMatrix.m32 = -((2 * NEAR_PLANE_DISTANCE * FAR_PLANE_DISTANCE) / frustum_length);
+		projectionMatrix.m33 = 0;
+		
+		/* DEBUG */
+		System.out.println(projectionMatrix.toString());
 	}
 }

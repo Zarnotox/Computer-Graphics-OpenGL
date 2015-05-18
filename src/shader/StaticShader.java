@@ -27,6 +27,11 @@ public class StaticShader extends ShaderProgram {
 	private int location_transformationMatrix;
 	
 	/**
+	 * The location of the shader variable projectionmatrix
+	 */
+	private int location_projectionMatrix;
+	
+	/**
 	 * Constructor
 	 */
 	public StaticShader()
@@ -57,7 +62,7 @@ public class StaticShader extends ShaderProgram {
 	protected void getAllUniformVarLocations()
 	{
 		location_transformationMatrix = super.getUniformVarLocation("transformationMatrix");
-		
+		location_projectionMatrix = super.getUniformVarLocation("projectionMatrix");
 	}
 	
 	/**
@@ -68,6 +73,14 @@ public class StaticShader extends ShaderProgram {
 	public void loadTransformationMatrix( Matrix4f matrix )
 	{
 		super.loadMatrix(location_transformationMatrix, matrix);
+	}
+	
+	/**
+	 * Load a projection matrix into the shader
+	 * @param matrix
+	 */
+	public void loadProjectionMatrix(Matrix4f matrix) {
+		super.loadMatrix(location_projectionMatrix, matrix);
 	}
 	
 }
