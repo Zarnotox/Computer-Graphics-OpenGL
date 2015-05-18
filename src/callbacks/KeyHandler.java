@@ -18,7 +18,7 @@ public class KeyHandler extends GLFWKeyCallback {
 	/**
 	 * The amount of pixels the camera moves into a certain direction for each callback
 	 */
-	public final static float CAMERA_MOVEMENT_STEPSIZE = 0.05f;
+	public final static float CAMERA_MOVEMENT_STEPSIZE = 0.1f;
 	
 	/**
 	 * The resources for the rendering
@@ -55,10 +55,12 @@ public class KeyHandler extends GLFWKeyCallback {
 			switch (key) {
 			/* CAMERA MOVEMENT */
 			case GLFW.GLFW_KEY_LEFT:
+			case GLFW.GLFW_KEY_A:
 				// Move camera to the left
 				activeCam.moveHorizontal(-CAMERA_MOVEMENT_STEPSIZE);
 				break;
 			case GLFW.GLFW_KEY_RIGHT:
+			case GLFW.GLFW_KEY_D:
 				// Move camera to the right
 				activeCam.moveHorizontal(CAMERA_MOVEMENT_STEPSIZE);
 				break;
@@ -69,7 +71,15 @@ public class KeyHandler extends GLFWKeyCallback {
 			case GLFW.GLFW_KEY_UP:
 				// Move camera up
 				activeCam.moveVertical(CAMERA_MOVEMENT_STEPSIZE);
-				break;			
+				break;
+			case GLFW.GLFW_KEY_W:
+				// Move backward along the z axis
+				activeCam.moveOut(-CAMERA_MOVEMENT_STEPSIZE);
+				break;
+			case GLFW.GLFW_KEY_S:
+				// Move forward along the z axis
+				activeCam.moveOut(CAMERA_MOVEMENT_STEPSIZE);
+				break;
 			}
 		}
 	}

@@ -241,7 +241,7 @@ public class OpenGLStart {
 		TexturedModel texturedModel = new TexturedModel(model, texture);
 		
 		// Reflectivity settings of the model
-		texturedModel.getTexture().setShineDamper(5);
+		texturedModel.getTexture().setShineDamper(10);
 		texturedModel.getTexture().setReflectivity(1);
 		
 		// Generate an entity from the model and texture

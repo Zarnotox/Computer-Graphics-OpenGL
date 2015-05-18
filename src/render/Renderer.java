@@ -86,6 +86,12 @@ public class Renderer {
 		shader.start();
 		shader.loadProjectionMatrix(projectionMatrix);
 		shader.stop();
+		
+		/* OpenGL props */
+		// Don't render backwards facing vertices
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glCullFace(GL11.GL_BACK);
+		
 	}
 	
 	/**
