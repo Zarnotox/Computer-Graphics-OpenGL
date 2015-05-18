@@ -4,10 +4,15 @@
 package shader;
 
 import java.io.IOException;
+import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import math.matrix.Matrix4f;
+import math.vector.Vector3f;
+
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
@@ -15,6 +20,11 @@ import org.lwjgl.opengl.GL20;
  * @author Bert
  */
 public abstract class ShaderProgram {
+	
+	/**
+	 * The reusable buffer to for shipping Matrix4f objects to OpenGL
+	 */
+	private static FloatBuffer MAT4FBuffer = BufferUtils.createFloatBuffer(Matrix4f.SIZE);
 	
 	/**
 	 * The ID of the compiled Shader
@@ -50,10 +60,17 @@ public abstract class ShaderProgram {
 			// Attach both shaders to the program
 			GL20.glAttachShader(programID, vertexShaderID);
 			GL20.glAttachShader(programID, fragmentShaderID);
+			
+			// Bind the attributes to the shaders
+			bindAttributes();
+			
 			// Use the shader
 			GL20.glLinkProgram(programID);
 			// Validate the shader program
 			GL20.glValidateProgram(programID);
+			
+			// Load up all the uniform var locations
+			getAllUniformVarLocations();
 			
 		}
 		catch (IOException e)
@@ -61,6 +78,23 @@ public abstract class ShaderProgram {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	/**
+	 * Method to fetch all the used uniform variables location
+	 * These variables are used in the shader code
+	 */
+	protected abstract void getAllUniformVarLocations();
+	
+	/**
+	 * Returns the id to the memory space where the given uniform variable resides
+	 * 
+	 * @param uniformName
+	 * @return
+	 */
+	protected int getUniformVarLocation( String uniformName )
+	{
+		return GL20.glGetUniformLocation(programID, uniformName);
 	}
 	
 	/**
@@ -149,6 +183,66 @@ public abstract class ShaderProgram {
 		
 		// Return the shader id
 		return shaderID;
+	}
+	
+	/**
+	 * Load a float into a uniform variable
+	 * 
+	 * @param location
+	 * @param value
+	 */
+	protected void loadFloat( int location, float value )
+	{
+		GL20.glUniform1f(location, value);
+	}
+	
+	/**
+	 * Load a vector into a uniform variable
+	 * 
+	 * @param location
+	 * @param vector
+	 */
+	protected void loadVector( int location, Vector3f vector )
+	{
+		GL20.glUniform3f(location, vector.getX(), vector.getY(), vector.getZ());
+	}
+	
+	/**
+	 * Load a boolean into a uniform variable
+	 * 
+	 * @param location
+	 * @param value
+	 */
+	protected void loadBoolean( int location, boolean value )
+	{
+		float loadValue = 0;
+		
+		if ( value )
+		{
+			loadValue = 1;
+		}
+		
+		GL20.glUniform1f(location, loadValue);
+	}
+	
+	/**
+	 * Load a 4x4 Matrix into a uniform value
+	 * 
+	 * @param location
+	 * @param matrix
+	 */
+	protected void loadMatrix( int location, Matrix4f matrix )
+	{
+		// Store the matrix into the buffer
+		matrix.store(MAT4FBuffer);
+		// Flip the buffer
+		MAT4FBuffer.flip();
+		// Load the buffer into OpenGL
+		/* The id of the memory location
+		 * False means the buffer was filled in Column Major Order
+		 * The buffer itself
+		 */
+		GL20.glUniformMatrix4fv(location, false, MAT4FBuffer);
 	}
 	
 }

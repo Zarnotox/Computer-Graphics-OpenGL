@@ -11,6 +11,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 import java.nio.ByteBuffer;
 
 import loader.Loader;
+import math.vector.Vector3f;
 import model.Model;
 import model.TexturedModel;
 
@@ -26,6 +27,7 @@ import shader.StaticShader;
 import texture.ModelTexture;
 import callbacks.CharHandler;
 import callbacks.KeyHandler;
+import entity.Entity;
 
 /**
  * OpenGL initialisation class based on the HelloWorld example found on the LWJGL website
@@ -216,6 +218,9 @@ public class OpenGLStart {
 				loader.loadTexture("res/trans_test.png")); // trans_test.png
 		TexturedModel texturedModel = new TexturedModel(model, texture);
 		
+		// Generate an entity from the model and texture
+		Entity entity =  new Entity(texturedModel, new Vector3f(0, 0, 0), 0, 0, 0, 1);
+		
 		// Loop till the user wants to close the window
 		while (glfwWindowShouldClose(window) == GL_FALSE)
 		{
@@ -224,8 +229,11 @@ public class OpenGLStart {
 			// Run shader
 			stShader.start();
 			
+			// Update entity
+			//entity.increasePosition(0.05f, 0, 0);
+			entity.increaseRotation(0, 1, 0);
 			// Render the model
-			renderer.render(texturedModel);
+			renderer.render(entity, stShader);
 			
 			// Stop the shader program
 			stShader.stop();

@@ -3,6 +3,7 @@
  */
 package shader;
 
+import math.matrix.Matrix4f;
 import render.Renderer;
 
 /**
@@ -19,6 +20,11 @@ public class StaticShader extends ShaderProgram {
 	 * Location of the fragment shader file
 	 */
 	private static final String FRAGMENT_SHADER_FILE = "src/shader/files/fragmentShader.txt";
+	
+	/**
+	 * The location of the shader variable transformationMatrix
+	 */
+	private int location_transformationMatrix;
 	
 	/**
 	 * Constructor
@@ -41,6 +47,27 @@ public class StaticShader extends ShaderProgram {
 		// Connect the texture coords VBO
 		super.bindAttribute(Renderer.TEXTURE_COORD_ATTR_INDEX, "textureCoords");
 		
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see shader.ShaderProgram#getAllUniformVarLocations()
+	 */
+	@Override
+	protected void getAllUniformVarLocations()
+	{
+		location_transformationMatrix = super.getUniformVarLocation("transformationMatrix");
+		
+	}
+	
+	/**
+	 * Load a transformation matrix into the shader
+	 * 
+	 * @param matrix
+	 */
+	public void loadTransformationMatrix( Matrix4f matrix )
+	{
+		super.loadMatrix(location_transformationMatrix, matrix);
 	}
 	
 }

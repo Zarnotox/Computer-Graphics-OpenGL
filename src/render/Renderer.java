@@ -6,6 +6,8 @@ package render;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
+import math.Maths;
+import math.matrix.Matrix4f;
 import model.Model;
 import model.TexturedModel;
 
@@ -13,6 +15,9 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+
+import shader.StaticShader;
+import entity.Entity;
 
 /**
  * @author Bert
@@ -55,8 +60,10 @@ public class Renderer {
 	 * 
 	 * @param model
 	 */
-	public void render( TexturedModel model )
+	public void render( Entity entity, StaticShader shader )
 	{
+		TexturedModel model = entity.getModel();
+		
 		/* Bind all resources */
 		// Bind the VAO attached to this model
 		GL30.glBindVertexArray(model.getVoaID());
@@ -65,14 +72,17 @@ public class Renderer {
 		// Enable texture coords
 		GL20.glEnableVertexAttribArray(TEXTURE_COORD_ATTR_INDEX);
 		
+		// Create transformation matrix for the object
+		Matrix4f transformationMatrix = Maths.createTransformationMatrix(
+				entity.getPosition(), entity.getRotationX(), entity.getRotationY(),
+				entity.getRotationZ(), entity.getScale());
+		// Load that matrix into the shader
+		shader.loadTransformationMatrix(transformationMatrix);
+		
 		// Activate the first texture bank, the 2DSampler (Shader) uses this one
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		// Set the active texture for the following draw
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, model.getTexture().getTextureID());
-		
-		/* The drawArray function is replaced with the drawElements function */
-		// Tell OpenGL to draw the vertices defined inside the activated VBO's
-		// GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, model.getVertexCount());
 		
 		/*
 		 * Draw the model to the scene
@@ -93,5 +103,4 @@ public class Renderer {
 		// Unbind the chosen VAO
 		GL30.glBindVertexArray(0);
 	}
-	
 }
