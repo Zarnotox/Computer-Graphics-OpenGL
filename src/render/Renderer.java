@@ -21,6 +21,7 @@ import org.lwjgl.opengl.GL30;
 import shader.StaticShader;
 import entity.Entity;
 import glCode.DisplayHelper;
+import glCode.RenderResources;
 
 /**
  * @author Bert
@@ -38,8 +39,6 @@ public class Renderer {
 	 * VAO at index 1
 	 */
 	public final static int TEXTURE_COORD_ATTR_INDEX = 1;
-	
-	
 	
 	/**
 	 * The field of view angle used for the camera
@@ -69,7 +68,7 @@ public class Renderer {
 	/**
 	 * 
 	 */
-	public Renderer(DisplayHelper displayHelper, StaticShader shader)
+	public Renderer( DisplayHelper displayHelper, StaticShader shader )
 	{
 		this.displayHelper = displayHelper;
 		
@@ -87,6 +86,9 @@ public class Renderer {
 	 */
 	public void prepare()
 	{
+		// Use the depth buffer to properly render triangles
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		
 		// Clear the color and depth buffers
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
@@ -99,8 +101,12 @@ public class Renderer {
 	 * 
 	 * @param model
 	 */
-	public void render( Entity entity, StaticShader shader )
+	public void render( Entity entity, RenderResources res )
 	{
+		/* Run shader */
+		res.getStShader().start();
+		
+		// Fetch the model from the entity
 		TexturedModel model = entity.getModel();
 		
 		/* Bind all resources */
@@ -111,12 +117,16 @@ public class Renderer {
 		// Enable texture coords
 		GL20.glEnableVertexAttribArray(TEXTURE_COORD_ATTR_INDEX);
 		
+		/* CAMERA MANIPULATION */
+		res.getStShader().loadviewMatrix(res.getActiveCamera());
+		
+		/* POSITION MANIPULATION */		
 		// Create transformation matrix for the object
 		Matrix4f transformationMatrix = Maths.createTransformationMatrix(
 				entity.getPosition(), entity.getRotationX(), entity.getRotationY(),
 				entity.getRotationZ(), entity.getScale());
 		// Load that matrix into the shader
-		shader.loadTransformationMatrix(transformationMatrix);
+		res.getStShader().loadTransformationMatrix(transformationMatrix);
 		
 		// Activate the first texture bank, the 2DSampler (Shader) uses this one
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
@@ -141,13 +151,17 @@ public class Renderer {
 		
 		// Unbind the chosen VAO
 		GL30.glBindVertexArray(0);
+		
+		/* Stop the shader program */
+		res.getStShader().stop();
 	}
 	
 	/**
 	 * Generate a projectionMatrix.
 	 * The projectionMatrix makes the objects onscreen more realistic looking
 	 */
-	private void createProjectionMatrix() {
+	private void createProjectionMatrix()
+	{
 		// Fetch the window dimensions
 		Dimension d = displayHelper.getWindowDimensions();
 		
@@ -157,7 +171,7 @@ public class Renderer {
 		
 		// Prepare matrix variables
 		float aspectRatio = (float) d.getWidth() / (float) d.getHeight();
-		float y_scale = (float) (1f / Math.tan(Math.toRadians(FOV/ 2f)) * aspectRatio);
+		float y_scale = (float) (1f / Math.tan(Math.toRadians(FOV / 2f)) * aspectRatio);
 		float x_scale = y_scale / aspectRatio;
 		float frustum_length = FAR_PLANE_DISTANCE - NEAR_PLANE_DISTANCE;
 		

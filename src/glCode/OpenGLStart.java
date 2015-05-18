@@ -10,14 +10,12 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 import java.awt.Dimension;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 
 import loader.Loader;
 import math.vector.Vector3f;
 import model.Model;
 import model.TexturedModel;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWCharCallback;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
@@ -30,6 +28,7 @@ import shader.StaticShader;
 import texture.ModelTexture;
 import callbacks.CharHandler;
 import callbacks.KeyHandler;
+import camera.MovableCamera;
 import entity.Entity;
 
 /**
@@ -39,17 +38,30 @@ import entity.Entity;
  */
 public class OpenGLStart {
 	
-	// Window handle
+	/**
+	 * Window handle
+	 */
 	private DisplayHelper windowHelper;
 	
-	// Errorhandler
+	/**
+	 * Errorhandler
+	 */
 	private GLFWErrorCallback errorHandler;
 	
-	// Class that handles key interrupts
+	/**
+	 * Class that handles key interrupts
+	 */
 	private GLFWKeyCallback keyCallback;
 	
-	// Class that handles character interrupts
+	/**
+	 * Class that handles character interrupts
+	 */
 	private GLFWCharCallback charCallback;
+	
+	/**
+	 * The object that holds resources for rendering
+	 */
+	private RenderResources res;
 	
 	/**
 	 * Constructor
@@ -66,11 +78,28 @@ public class OpenGLStart {
 	{
 		System.out.println("Launching OpenGL");
 		
-		// Generate Keyhandlers
-		generateInputhandler();
-		
 		// Do initialisation
 		init();
+		
+		// Get the current context from GLFW
+		GLContext.createFromCurrent();
+		
+		
+		/* SHADERS */
+		// Create static shader
+		StaticShader stShader = new StaticShader();
+		// Load additional shaders
+		loadShaders();
+		
+		// Generate render resources
+		res = new RenderResources(stShader);
+		
+		/* CAMERAS */
+		res.setActiveCamera(new MovableCamera(new Vector3f(0, 0, 0), 0, 0, 0));
+		res.addCamera(new MovableCamera(new Vector3f(0, 0, 5), 0, 0, 0));
+		
+		// Generate Keyhandlers
+		initInputhandlers();
 		
 		// Run the loop
 		loop();
@@ -86,19 +115,23 @@ public class OpenGLStart {
 	}
 	
 	/**
-	 * 
+	 * Initialise inputhandlers
 	 */
-	private void generateInputhandler()
+	private void initInputhandlers()
 	{
 		// The handler for key events
-		keyCallback = new KeyHandler();
+		keyCallback = new KeyHandler(res);
 		
 		// The handler for char events
-		charCallback = new CharHandler();
+		charCallback = new CharHandler(res);
+		
+		// Add handlers to the window
+		glfwSetKeyCallback(windowHelper.getHandle(), keyCallback);
+		glfwSetCharCallback(windowHelper.getHandle(), charCallback);
 	}
 	
 	/**
-	 * 
+	 * Destroy inputhandlers
 	 */
 	private void releaseInputHandlers()
 	{
@@ -106,6 +139,14 @@ public class OpenGLStart {
 		keyCallback.release();
 		
 		charCallback.release();
+	}
+	
+	/**
+	 * Compile and load shaders
+	 */
+	private void loadShaders()
+	{
+		
 	}
 	
 	/**
@@ -138,16 +179,13 @@ public class OpenGLStart {
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 		
 		// Get the windowhandle
-		long windowHandle = glfwCreateWindow(windowWidth, windowHeight, windowTitle, NULL, NULL);
+		long windowHandle = glfwCreateWindow(windowWidth, windowHeight, windowTitle,
+				NULL, NULL);
 		// Check the handle
 		if ( windowHandle == NULL )
 		{
 			throw new RuntimeException("Could not create the GLFW window");
 		}
-		
-		/* SETUP KEY LISTENERS */
-		glfwSetKeyCallback(windowHandle, keyCallback);
-		glfwSetCharCallback(windowHandle, charCallback);
 		
 		// Generate a displayhelper object for the created window
 		windowHelper = new DisplayHelper(windowHandle);
@@ -179,20 +217,13 @@ public class OpenGLStart {
 	{
 		System.out.println("Running loop");
 		
-		// Get the current context from GLFW
-		GLContext.createFromCurrent();
-		
 		// Set the base values of the color buffers
 		glClearColor(0, 0, 0, 0);
-		
-		/* SHADERS */
-		// Create static shader
-		StaticShader stShader = new StaticShader();
 		
 		// Create a new Loader
 		Loader loader = new Loader();
 		// Create a new Renderer
-		Renderer renderer = new Renderer(windowHelper, stShader);
+		Renderer renderer = new Renderer(windowHelper, res.getStShader());
 		
 		// A model
 		float[] vertices = {
@@ -237,17 +268,13 @@ public class OpenGLStart {
 		{
 			// Prepare for rendering the scene
 			renderer.prepare();
-			// Run shader
-			stShader.start();
 			
 			// Update entity
-			//entity.increasePosition(0, 0, -0.005f);
+			// entity.increasePosition(0, 0, -0.005f);
 			entity.increaseRotation(0, 1, 0);
-			// Render the model
-			renderer.render(entity, stShader);
 			
-			// Stop the shader program
-			stShader.stop();
+			// Render the entity
+			renderer.render(entity, res);
 			
 			// Swap the buffer / show the rendered stuff
 			glfwSwapBuffers(windowHelper.getHandle());
@@ -258,7 +285,7 @@ public class OpenGLStart {
 		
 		/* CLEANUP */
 		// Cleanup shader resources
-		stShader.cleanUp();
+		res.getStShader().cleanUp();
 		
 		// Cleanup buffers (VAO/VBO)
 		loader.cleanUp();

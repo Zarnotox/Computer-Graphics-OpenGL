@@ -3,6 +3,8 @@
  */
 package shader;
 
+import camera.Camera;
+import math.Maths;
 import math.matrix.Matrix4f;
 import render.Renderer;
 
@@ -30,6 +32,11 @@ public class StaticShader extends ShaderProgram {
 	 * The location of the shader variable projectionmatrix
 	 */
 	private int location_projectionMatrix;
+	
+	/**
+	 * The location of the shader variable viewmatrix
+	 */
+	private int location_viewMatrix;
 	
 	/**
 	 * Constructor
@@ -63,6 +70,7 @@ public class StaticShader extends ShaderProgram {
 	{
 		location_transformationMatrix = super.getUniformVarLocation("transformationMatrix");
 		location_projectionMatrix = super.getUniformVarLocation("projectionMatrix");
+		location_viewMatrix = super.getUniformVarLocation("viewMatrix");
 	}
 	
 	/**
@@ -77,10 +85,25 @@ public class StaticShader extends ShaderProgram {
 	
 	/**
 	 * Load a projection matrix into the shader
+	 * 
 	 * @param matrix
 	 */
-	public void loadProjectionMatrix(Matrix4f matrix) {
+	public void loadProjectionMatrix( Matrix4f matrix )
+	{
 		super.loadMatrix(location_projectionMatrix, matrix);
+	}
+	
+	/**
+	 * Load a view matrix into the shader
+	 * 
+	 * @param matrix
+	 */
+	public void loadviewMatrix( Camera camera )
+	{
+		// Generate the viewmatrix based on the camera
+		Matrix4f matrix = Maths.createViewMatrix(camera);
+		// Store the viewmatrix
+		super.loadMatrix(location_viewMatrix, matrix);
 	}
 	
 }
