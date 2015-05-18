@@ -52,4 +52,5 @@ public class TexturedModel extends Model {
 		return this.texture;
 	}
 	
+	
 }

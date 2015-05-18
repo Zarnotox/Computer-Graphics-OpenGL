@@ -239,6 +239,11 @@ public class OpenGLStart {
 				loader.loadTexture("res/squareTexture_flatColour.png")); // trans_test.png
 		// Link model and texture
 		TexturedModel texturedModel = new TexturedModel(model, texture);
+		
+		// Reflectivity settings of the model
+		texturedModel.getTexture().setShineDamper(5);
+		texturedModel.getTexture().setReflectivity(1);
+		
 		// Generate an entity from the model and texture
 		Entity entity = new Entity(texturedModel, new Vector3f(0, -5, -15), 0, 0, 0, 1);
 		

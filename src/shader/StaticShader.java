@@ -51,9 +51,19 @@ public class StaticShader extends ShaderProgram {
 	private int location_lightColour;
 	
 	/**
+	 * The location of the shader variable shineDamper
+	 */
+	private int location_shineDamper;
+	
+	/**
+	 * The location of the shader variable reflectivity
+	 */
+	private int location_reflectivity;
+	
+	/**
 	 * Constructor
 	 */
-	public StaticShader(Loader loader)
+	public StaticShader( Loader loader )
 	{
 		// Let the super class handle the shader files
 		super(VERTEX_SHADER_FILE, FRAGMENT_SHADER_FILE, loader);
@@ -87,6 +97,8 @@ public class StaticShader extends ShaderProgram {
 		location_viewMatrix = super.getUniformVarLocation("viewMatrix");
 		location_lightColour = super.getUniformVarLocation("lightColour");
 		location_lightPosition = super.getUniformVarLocation("lightPosition");
+		location_shineDamper = super.getUniformVarLocation("shineDamper");
+		location_reflectivity = super.getUniformVarLocation("reflectivity");
 	}
 	
 	/**
@@ -124,13 +136,29 @@ public class StaticShader extends ShaderProgram {
 	
 	/**
 	 * Loads a light object into the shader
+	 * 
 	 * @param light
 	 */
-	public void loadLight(Light light) {
+	public void loadLight( Light light )
+	{
 		// Load the position of the light
 		super.loadVector(location_lightPosition, light.getPosition());
 		// Load the colour of the light
 		super.loadVector(location_lightColour, light.getColor());
+	}
+	
+	/**
+	 * Pass shine variables onto the shader
+	 * 
+	 * @param damper
+	 * @param reflectivity
+	 */
+	public void loadShineVariables( float damper, float reflectivity )
+	{
+		// Load the damper amount
+		super.loadFloat(location_shineDamper, damper);
+		// Load the reflectivity amount
+		super.loadFloat(location_reflectivity, reflectivity);
 	}
 	
 }

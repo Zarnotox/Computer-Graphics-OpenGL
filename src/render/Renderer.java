@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import shader.StaticShader;
+import texture.ModelTexture;
 import entity.Entity;
 import glCode.DisplayHelper;
 import glCode.RenderResources;
@@ -111,6 +112,8 @@ public class Renderer {
 	{
 		// Fetch the model from the entity
 		TexturedModel model = entity.getModel();
+		// Fetch the texture from the model
+		ModelTexture texture = model.getTexture();
 		
 		// Fetch the static shader
 		StaticShader staticShader = res.getStShader();
@@ -130,6 +133,9 @@ public class Renderer {
 		
 		/* LIGHT MANIPULATION */
 		staticShader.loadLight(res.getLightList().get(0));
+		// Reflectivity
+		staticShader.loadShineVariables(texture.getShineDamper(),
+				texture.getReflectivity());
 		
 		/* CAMERA MANIPULATION */
 		staticShader.loadviewMatrix(res.getActiveCamera());
