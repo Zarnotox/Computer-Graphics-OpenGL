@@ -1,7 +1,7 @@
 /**
  * 
  */
-package texture;
+package entity.texture;
 
 /**
  * @author Bert

@@ -1,9 +1,9 @@
 /**
  * 
  */
-package model;
+package entity.model;
 
-import texture.ModelTexture;
+import entity.texture.ModelTexture;
 
 /**
  * @author Bert

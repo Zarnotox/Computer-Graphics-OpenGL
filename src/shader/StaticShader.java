@@ -3,8 +3,8 @@
  */
 package shader;
 
-import camera.Camera;
-import light.Light;
+import entity.camera.Camera;
+import entity.light.Light;
 import loader.Loader;
 import math.Maths;
 import math.matrix.Matrix4f;

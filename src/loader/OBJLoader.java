@@ -5,9 +5,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import entity.model.Model;
 import math.vector.Vector2f;
 import math.vector.Vector3f;
-import model.Model;
 
 public class OBJLoader {
 	

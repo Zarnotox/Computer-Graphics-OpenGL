@@ -13,12 +13,9 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import light.Light;
 import loader.Loader;
 import loader.OBJLoader;
 import math.vector.Vector3f;
-import model.Model;
-import model.TexturedModel;
 
 import org.lwjgl.glfw.GLFWCharCallback;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -29,11 +26,14 @@ import org.lwjgl.opengl.GLContext;
 
 import render.Render;
 import shader.StaticShader;
-import texture.ModelTexture;
 import callbacks.CharHandler;
 import callbacks.KeyHandler;
-import camera.MovableCamera;
 import entity.Entity;
+import entity.camera.MovableCamera;
+import entity.light.Light;
+import entity.model.Model;
+import entity.model.TexturedModel;
+import entity.texture.ModelTexture;
 
 /**
  * OpenGL initialisation class based on the HelloWorld example found on the LWJGL website

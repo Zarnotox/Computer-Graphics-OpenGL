@@ -1,7 +1,7 @@
 /**
  * 
  */
-package light;
+package entity.light;
 
 import math.vector.Vector3f;
 

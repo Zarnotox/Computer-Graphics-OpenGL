@@ -9,14 +9,13 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.Model;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+import entity.model.Model;
 import render.Render;
 
 /**

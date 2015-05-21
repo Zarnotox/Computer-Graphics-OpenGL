@@ -6,9 +6,9 @@ package glCode;
 import java.util.ArrayList;
 import java.util.List;
 
-import light.Light;
 import shader.ShaderProgram;
-import camera.Camera;
+import entity.camera.Camera;
+import entity.light.Light;
 
 /**
  * @author Bert

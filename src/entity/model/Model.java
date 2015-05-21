@@ -1,7 +1,7 @@
 /**
  * 
  */
-package model;
+package entity.model;
 
 /**
  * @author Bert

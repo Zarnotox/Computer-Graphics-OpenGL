@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 import entity.Entity;
+import entity.model.TexturedModel;
 import glCode.DisplayHelper;
 import glCode.RenderResources;
 import loader.Loader;
-import model.TexturedModel;
 import shader.StaticShader;
 
 /**

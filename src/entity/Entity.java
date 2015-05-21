@@ -3,8 +3,8 @@
  */
 package entity;
 
+import entity.model.TexturedModel;
 import math.vector.Vector3f;
-import model.TexturedModel;
 
 /**
  * @author Bert

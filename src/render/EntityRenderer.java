@@ -13,7 +13,6 @@ import java.util.Map;
 
 import math.Maths;
 import math.matrix.Matrix4f;
-import model.TexturedModel;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -21,8 +20,9 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import shader.StaticShader;
-import texture.ModelTexture;
 import entity.Entity;
+import entity.model.TexturedModel;
+import entity.texture.ModelTexture;
 import glCode.DisplayHelper;
 
 /**

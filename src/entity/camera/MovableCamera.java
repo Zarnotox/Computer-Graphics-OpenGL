@@ -1,7 +1,7 @@
 /**
  * 
  */
-package camera;
+package entity.camera;
 
 import math.vector.Vector3f;
 
