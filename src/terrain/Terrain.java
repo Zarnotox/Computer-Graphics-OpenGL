@@ -50,9 +50,9 @@ public class Terrain {
 		// Save the texture of this terrain
 		this.texture = texture;
 		
-		// Calculate the amount of pixels in X-axis direction
+		// Calculate the x coord
 		this.x = gridX * SIZE;
-		// Calculate the amount of pixels in the Z-axis direction
+		// Calculate the z coord
 		this.z = gridX * SIZE;
 		
 		// Generate a terrain model
@@ -61,6 +61,7 @@ public class Terrain {
 	
 	/**
 	 * Generate a terrain model
+	 * 
 	 * @param loader
 	 * @return
 	 */
@@ -125,7 +126,6 @@ public class Terrain {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public float getX()
@@ -134,7 +134,6 @@ public class Terrain {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public float getZ()
@@ -143,7 +142,6 @@ public class Terrain {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public Model getModel()
@@ -152,7 +150,6 @@ public class Terrain {
 	}
 	
 	/**
-	 * 
 	 * @return
 	 */
 	public ModelTexture getTexture()

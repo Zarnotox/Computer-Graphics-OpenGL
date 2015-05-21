@@ -107,11 +107,11 @@ public class OpenGLStart {
 		res = new RenderResources();
 		
 		/* CAMERAS */
-		res.setActiveCamera(new MovableCamera(new Vector3f(0, 10, 0), 20, 0, 0));
+		res.setActiveCamera(new MovableCamera(new Vector3f(0, 3, 0), 0, 0, 0));
 		res.addCamera(new MovableCamera(new Vector3f(0, -10, -15), -90, 0, 0));
 		
 		/* LIGHTS */
-		res.addLight(new Light(new Vector3f(0, -10, -5), new Vector3f(0.8f, 0.8f, 0.7f)));
+		res.addLight(new Light(new Vector3f(3000, 2000, 2000), new Vector3f(1, 1, 1)));
 		
 		// Generate Keyhandlers
 		initInputhandlers();
@@ -265,10 +265,10 @@ public class OpenGLStart {
 				loader.loadTexture("res/squareTexture_flatColour.png"));
 		// Generate new terrain
 		Terrain terrain = new Terrain(0, 0, loader, terrainTexture);
-		//Terrain terrain2 = new Terrain(1, 0, loader, terrainTexture);
+		Terrain terrain2 = new Terrain(1, 0, loader, terrainTexture);
 		// Add the terrain to the list
 		terrainList.add(terrain);
-		//terrainList.add(terrain2);
+		terrainList.add(terrain2);
 		
 		// Loop till the user wants to close the window
 		while (glfwWindowShouldClose(windowHelper.getHandle()) == GL_FALSE)

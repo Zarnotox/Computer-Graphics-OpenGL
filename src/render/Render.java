@@ -162,14 +162,6 @@ public class Render {
 		Camera cam = res.getActiveCamera();
 		Light sun = res.getLightList().get(0);
 		
-		/* TERRAIN */
-		// Do the same as the entity render cycle
-		terrainShader.start();
-		terrainShader.loadLight(sun);
-		terrainShader.loadviewMatrix(cam);
-		terrainRenderer.render(terrainList);
-		terrainShader.stop();
-		
 		/* ENTITIES */
 		// Start shader programs
 		entityShader.start();
@@ -179,9 +171,16 @@ public class Render {
 		entityShader.loadviewMatrix(cam);
 		// Render
 		entityRenderer.render(entityMap);
-		
 		// Stop the shader program
 		entityShader.stop();
+		
+		/* TERRAIN */
+		// Do the same as the entity render cycle
+		terrainShader.start();
+		terrainShader.loadLight(sun);
+		terrainShader.loadviewMatrix(cam);
+		terrainRenderer.render(terrainList);
+		terrainShader.stop();
 		
 		// Clear the entity collections
 		this.entityMap.clear();
