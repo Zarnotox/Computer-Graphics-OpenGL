@@ -16,7 +16,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-import render.Renderer;
+
+import render.Render;
 
 /**
  * @author Bert
@@ -93,11 +94,11 @@ public class Loader {
 		GL30.glBindVertexArray(vaoID);
 		
 		// Store the positions inside the VAO, INDEX 0
-		storeDataInVAO(Renderer.POSITION_ATTR_INDEX, 3, positions);
+		storeDataInVAO(Render.POSITION_ATTR_INDEX, 3, positions);
 		// Store the texture coord mappings inside the VAO, INDEX 1
-		storeDataInVAO(Renderer.TEXTURE_COORD_ATTR_INDEX, 2, textureCoords);
+		storeDataInVAO(Render.TEXTURE_COORD_ATTR_INDEX, 2, textureCoords);
 		// Store the texture coord mappings inside the VAO, INDEX 1
-		storeDataInVAO(Renderer.NORMALS_ATTR_INDEX, 3, normals);
+		storeDataInVAO(Render.NORMALS_ATTR_INDEX, 3, normals);
 		
 		// Store the indices into the VAO
 		bindIndicesBuffer(indices);

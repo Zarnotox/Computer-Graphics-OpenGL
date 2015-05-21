@@ -8,6 +8,8 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
 
 import java.awt.Dimension;
+import java.util.List;
+import java.util.Map;
 
 import math.Maths;
 import math.matrix.Matrix4f;
@@ -22,30 +24,11 @@ import shader.StaticShader;
 import texture.ModelTexture;
 import entity.Entity;
 import glCode.DisplayHelper;
-import glCode.RenderResources;
 
 /**
  * @author Bert
  */
-public class Renderer {
-	
-	/**
-	 * This variable declares that the position attribute VBO has to be stored into the
-	 * VAO at index 0
-	 */
-	public final static int POSITION_ATTR_INDEX = 0;
-	
-	/**
-	 * This variable declares that texture coordinate mappings will be stored inside the
-	 * VAO at index 1
-	 */
-	public final static int TEXTURE_COORD_ATTR_INDEX = 1;
-	
-	/**
-	 * This variable declares that normal vectors will be stored inside the
-	 * VAO at index 2
-	 */
-	public final static int NORMALS_ATTR_INDEX = 2;
+public class EntityRenderer {
 	
 	/**
 	 * The field of view angle used for the camera
@@ -73,11 +56,17 @@ public class Renderer {
 	private Matrix4f projectionMatrix;
 	
 	/**
+	 * The static shader instance
+	 */
+	private StaticShader stShader;
+	
+	/**
 	 * 
 	 */
-	public Renderer( DisplayHelper displayHelper, StaticShader shader )
+	public EntityRenderer( DisplayHelper displayHelper, StaticShader shader )
 	{
 		this.displayHelper = displayHelper;
+		this.stShader = shader;
 		
 		// Generate the projectionMatrix
 		createProjectionMatrix();
@@ -110,78 +99,86 @@ public class Renderer {
 	}
 	
 	/**
-	 * Render the given model to the scene
+	 * Render every entity, grouped by model
 	 * 
-	 * @param model
+	 * @param entities
 	 */
-	public void render( Entity entity, RenderResources res )
+	public void render( Map<TexturedModel, List<Entity>> entities )
 	{
-		// Fetch the model from the entity
-		TexturedModel model = entity.getModel();
-		// Fetch the texture from the model
-		ModelTexture texture = model.getTexture();
-		
-		// Fetch the static shader
-		StaticShader staticShader = res.getStShader();
-		
-		/* Run shader */
-		staticShader.start();
-		
+		// Loop the map
+		for (TexturedModel model : entities.keySet())
+		{
+			// Prepare the model
+			prepareTexturedModel(model);
+			// Fetch all related entities
+			List<Entity> ent = entities.get(model);
+			// Loop all these entities
+			for (Entity entity : ent)
+			{
+				// Prepare the entity
+				prepareInstance(entity);
+				// Render the entity
+				/*
+				 * Draw the model to the scene
+				 * Draw Triangles
+				 * Draw amount of vertices
+				 * We are referring to the indices, so look for Unsigned Ints
+				 * 0 offset
+				 */
+				GL11.glDrawElements(GL11.GL_TRIANGLES, model.getVertexCount(),
+						GL11.GL_UNSIGNED_INT, 0);
+			}
+			
+			// Unbind the model
+			unbindTexturedModel();
+		}
+	}
+	
+	private void prepareTexturedModel( TexturedModel model )
+	{
 		/* Bind all resources */
 		// Bind the VAO attached to this model
 		GL30.glBindVertexArray(model.getVoaID());
 		// Enable the list with INDEX 0 from the VAO
-		GL20.glEnableVertexAttribArray(POSITION_ATTR_INDEX);
+		GL20.glEnableVertexAttribArray(Render.POSITION_ATTR_INDEX);
 		// Enable texture coords
-		GL20.glEnableVertexAttribArray(TEXTURE_COORD_ATTR_INDEX);
+		GL20.glEnableVertexAttribArray(Render.TEXTURE_COORD_ATTR_INDEX);
 		// Enable normals
-		GL20.glEnableVertexAttribArray(NORMALS_ATTR_INDEX);
+		GL20.glEnableVertexAttribArray(Render.NORMALS_ATTR_INDEX);
 		
-		/* LIGHT MANIPULATION */
-		staticShader.loadLight(res.getLightList().get(0));
+		// Get the texture
+		ModelTexture texture = model.getTexture();
 		// Reflectivity
-		staticShader.loadShineVariables(texture.getShineDamper(),
-				texture.getReflectivity());
+		stShader.loadShineVariables(texture.getShineDamper(), texture.getReflectivity());
+		// Activate the first texture bank, the 2DSampler (Shader) uses this one
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		// Set the active texture for the following draw
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, model.getTexture().getTextureID());
+	}
+	
+	private void unbindTexturedModel()
+	{
+		/* Unbind all used resources */
+		// Unbind the position VBO
+		GL20.glDisableVertexAttribArray(Render.POSITION_ATTR_INDEX);
+		// Unbind texture coords
+		GL20.glDisableVertexAttribArray(Render.TEXTURE_COORD_ATTR_INDEX);
+		// Unbind the normals
+		GL20.glDisableVertexAttribArray(Render.NORMALS_ATTR_INDEX);
 		
-		/* CAMERA MANIPULATION */
-		staticShader.loadviewMatrix(res.getActiveCamera());
-		
+		// Unbind the chosen VAO
+		GL30.glBindVertexArray(0);
+	}
+	
+	private void prepareInstance( Entity entity )
+	{
 		/* POSITION MANIPULATION */
 		// Create transformation matrix for the object
 		Matrix4f transformationMatrix = Maths.createTransformationMatrix(
 				entity.getPosition(), entity.getRotationX(), entity.getRotationY(),
 				entity.getRotationZ(), entity.getScale());
 		// Load that matrix into the shader
-		res.getStShader().loadTransformationMatrix(transformationMatrix);
-		
-		// Activate the first texture bank, the 2DSampler (Shader) uses this one
-		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		// Set the active texture for the following draw
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, model.getTexture().getTextureID());
-		
-		/*
-		 * Draw the model to the scene
-		 * Draw Triangles
-		 * Draw amount of vertices
-		 * We are referring to the indices, so look for Unsigned Ints
-		 * 0 offset
-		 */
-		GL11.glDrawElements(GL11.GL_TRIANGLES, model.getVertexCount(),
-				GL11.GL_UNSIGNED_INT, 0);
-		
-		/* Unbind all used resources */
-		// Unbind the position VBO
-		GL20.glDisableVertexAttribArray(POSITION_ATTR_INDEX);
-		// Unbind texture coords
-		GL20.glDisableVertexAttribArray(TEXTURE_COORD_ATTR_INDEX);
-		// Unbind the normals
-		GL20.glDisableVertexAttribArray(NORMALS_ATTR_INDEX);
-		
-		// Unbind the chosen VAO
-		GL30.glBindVertexArray(0);
-		
-		/* Stop the shader program */
-		staticShader.stop();
+		stShader.loadTransformationMatrix(transformationMatrix);
 	}
 	
 	/**

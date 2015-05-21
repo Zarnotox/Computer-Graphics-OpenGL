@@ -8,7 +8,6 @@ import java.util.List;
 
 import light.Light;
 import shader.ShaderProgram;
-import shader.StaticShader;
 import camera.Camera;
 
 /**
@@ -21,7 +20,7 @@ public class RenderResources {
 	/**
 	 * The static shader
 	 */
-	private StaticShader stShader;
+	//private StaticShader stShader;
 	
 	/**
 	 * The list of generated shaders
@@ -49,10 +48,10 @@ public class RenderResources {
 	/**
 	 * Constructor
 	 */
-	public RenderResources( StaticShader shader )
+	public RenderResources( )
 	{
 		
-		this.stShader = shader;
+		//this.stShader = shader;
 		
 		// Generate lists
 		cameraList = new ArrayList<>();
@@ -165,10 +164,12 @@ public class RenderResources {
 	/**
 	 * @return the stShader
 	 */
-	public StaticShader getStShader()
-	{
-		return this.stShader;
-	}
+	/*
+	 * public StaticShader getStShader()
+	 * {
+	 * return this.stShader;
+	 * }
+	 */
 	
 	/**
 	 * @return the shaderList

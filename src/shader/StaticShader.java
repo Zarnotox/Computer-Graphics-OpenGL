@@ -8,7 +8,7 @@ import light.Light;
 import loader.Loader;
 import math.Maths;
 import math.matrix.Matrix4f;
-import render.Renderer;
+import render.Render;
 
 /**
  * @author Bert
@@ -77,11 +77,11 @@ public class StaticShader extends ShaderProgram {
 	protected void bindAttributes()
 	{
 		// Connect the position VBO (from the VAO at INDEX 0) to the variable position
-		super.bindAttribute(Renderer.POSITION_ATTR_INDEX, "position");
+		super.bindAttribute(Render.POSITION_ATTR_INDEX, "position");
 		// Connect the texture coords VBO
-		super.bindAttribute(Renderer.TEXTURE_COORD_ATTR_INDEX, "textureCoords");
+		super.bindAttribute(Render.TEXTURE_COORD_ATTR_INDEX, "textureCoords");
 		// Connect the normals VBO to the VAO
-		super.bindAttribute(Renderer.NORMALS_ATTR_INDEX, "normal");
+		super.bindAttribute(Render.NORMALS_ATTR_INDEX, "normal");
 		
 	}
 	

@@ -10,6 +10,8 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 import java.awt.Dimension;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import light.Light;
 import loader.Loader;
@@ -25,7 +27,7 @@ import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 
-import render.Renderer;
+import render.Render;
 import shader.StaticShader;
 import texture.ModelTexture;
 import callbacks.CharHandler;
@@ -96,12 +98,12 @@ public class OpenGLStart {
 		
 		/* SHADERS */
 		// Create static shader
-		StaticShader stShader = new StaticShader(loader);
+		// StaticShader stShader = new StaticShader(loader);
 		// Load additional shaders
 		loadShaders();
 		
 		// Generate render resources
-		res = new RenderResources(stShader);
+		res = new RenderResources();
 		
 		/* CAMERAS */
 		res.setActiveCamera(new MovableCamera(new Vector3f(0, 0, 0), 0, 0, 0));
@@ -230,7 +232,11 @@ public class OpenGLStart {
 		System.out.println("Running loop");
 		
 		// Create a new Renderer
-		Renderer renderer = new Renderer(windowHelper, res.getStShader());
+		// EntityRenderer renderer = new EntityRenderer(windowHelper, res.getStShader());
+		Render renderer = new Render(windowHelper, loader);
+		
+		// Generate an entitylist to render
+		List<Entity> entityList = new ArrayList<>();
 		
 		// Create the model
 		Model model = OBJLoader.loadObjModel("res/dragon.obj", loader);
@@ -246,19 +252,28 @@ public class OpenGLStart {
 		
 		// Generate an entity from the model and texture
 		Entity entity = new Entity(texturedModel, new Vector3f(0, -5, -15), 0, 0, 0, 1);
+		// Add the entity to the entity list
+		entityList.add(entity);
 		
 		// Loop till the user wants to close the window
 		while (glfwWindowShouldClose(windowHelper.getHandle()) == GL_FALSE)
 		{
 			// Prepare for rendering the scene
-			renderer.prepare();
+			// renderer.prepare();
 			
 			// Update entity
 			// entity.increasePosition(0, 0, -0.005f);
 			entity.increaseRotation(0, 1, 0);
 			
+			// Load all entities into the scene
+			for (Entity e : entityList)
+			{
+				renderer.processEntity(e);
+			}
+			
 			// Render the entity
-			renderer.render(entity, res);
+			// renderer.render(entity, res);
+			renderer.render(res);
 			
 			// Swap the buffer / show the rendered stuff
 			glfwSwapBuffers(windowHelper.getHandle());
@@ -269,7 +284,9 @@ public class OpenGLStart {
 		
 		/* CLEANUP */
 		// Cleanup shader resources
-		res.getStShader().cleanUp();
+		// res.getStShader().cleanUp();
+		
+		renderer.cleanUp();
 		
 		// Cleanup buffers (VAO/VBO)
 		loader.cleanUp();
