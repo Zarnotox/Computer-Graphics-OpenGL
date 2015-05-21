@@ -37,9 +37,9 @@ public abstract class Camera {
 	
 	/**
 	 * @param position
-	 * @param pitch
-	 * @param yaw
-	 * @param roll
+	 * @param pitch Rotation around the X-axis
+	 * @param yaw Rotation around the Y-axis
+	 * @param roll Rotation around the Z-axis
 	 */
 	public Camera( Vector3f position, float pitch, float yaw, float roll )
 	{

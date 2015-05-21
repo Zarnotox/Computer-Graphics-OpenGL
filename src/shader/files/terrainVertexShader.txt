@@ -1,0 +1,46 @@
+#version 400 core
+
+// Variables from the VAO
+in vec3 position;
+// Texture mapping from the vertex
+in vec2 textureCoords;
+// The normal of this vertex
+in vec3 normal;
+
+// Output to fragment shader
+// VARIABLE NAMES MATTER!
+// Adjusted texture coordinates
+out vec2 pass_textureCoords;
+// The normal of this vertex
+out vec3 surfaceNormal;
+// The vector from this vertex aiming to the light
+out vec3 toLightVector;
+// The vector towards the camera
+out vec3 toCameraVector;
+
+// The injected variables from the shader java file
+uniform mat4 transformationMatrix;
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform vec3 lightPosition;
+
+void main(void) {
+	
+	// Calculate the transformed location of this vertec
+	vec4 worldPosition = transformationMatrix * vec4(position, 1.0);
+	
+	// Set position of vertex
+	gl_Position = projectionMatrix * viewMatrix * worldPosition;
+	
+	// Lineair assign vertex coords to texture coords
+	pass_textureCoords = textureCoords;
+	
+	// Pass the transformed normal of this vertex to the fragment shader
+	surfaceNormal = (transformationMatrix * vec4(normal, 0.0)).xyz;
+	
+	// Pass the vector towards the light, 
+	toLightVector = lightPosition - worldPosition.xyz;
+	
+	// Calculate the vector towards the camera
+	toCameraVector = (inverse(viewMatrix) * vec4(0.0, 0.0, 0.0, 1.0)).xyz - worldPosition.xyz;
+}

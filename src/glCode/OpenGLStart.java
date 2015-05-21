@@ -26,6 +26,7 @@ import org.lwjgl.opengl.GLContext;
 
 import render.Render;
 import shader.StaticShader;
+import terrain.Terrain;
 import callbacks.CharHandler;
 import callbacks.KeyHandler;
 import entity.Entity;
@@ -106,8 +107,8 @@ public class OpenGLStart {
 		res = new RenderResources();
 		
 		/* CAMERAS */
-		res.setActiveCamera(new MovableCamera(new Vector3f(0, 0, 0), 0, 0, 0));
-		res.addCamera(new MovableCamera(new Vector3f(0, 0, 5), 0, 0, 0));
+		res.setActiveCamera(new MovableCamera(new Vector3f(0, 10, 0), 20, 0, 0));
+		res.addCamera(new MovableCamera(new Vector3f(0, -10, -15), -90, 0, 0));
 		
 		/* LIGHTS */
 		res.addLight(new Light(new Vector3f(0, -10, -5), new Vector3f(0.8f, 0.8f, 0.7f)));
@@ -237,6 +238,9 @@ public class OpenGLStart {
 		
 		// Generate an entitylist to render
 		List<Entity> entityList = new ArrayList<>();
+		List<Terrain> terrainList = new ArrayList<>();
+		
+		/* OBJECT MODELS */
 		
 		// Create the model
 		Model model = OBJLoader.loadObjModel("res/dragon.obj", loader);
@@ -251,9 +255,20 @@ public class OpenGLStart {
 		texturedModel.getTexture().setReflectivity(1);
 		
 		// Generate an entity from the model and texture
-		Entity entity = new Entity(texturedModel, new Vector3f(0, -5, -15), 0, 0, 0, 1);
+		Entity entity = new Entity(texturedModel, new Vector3f(0, 0, -15), 0, 0, 0, 1);
 		// Add the entity to the entity list
 		entityList.add(entity);
+		
+		/* TERRAINS */
+		// Load grass terrain texture
+		ModelTexture terrainTexture = new ModelTexture(
+				loader.loadTexture("res/squareTexture_flatColour.png"));
+		// Generate new terrain
+		Terrain terrain = new Terrain(0, 0, loader, terrainTexture);
+		//Terrain terrain2 = new Terrain(1, 0, loader, terrainTexture);
+		// Add the terrain to the list
+		terrainList.add(terrain);
+		//terrainList.add(terrain2);
 		
 		// Loop till the user wants to close the window
 		while (glfwWindowShouldClose(windowHelper.getHandle()) == GL_FALSE)
@@ -271,6 +286,12 @@ public class OpenGLStart {
 				renderer.processEntity(e);
 			}
 			
+			// Load all terrains into the scene
+			for (Terrain t : terrainList)
+			{
+				renderer.processTerrain(t);
+			}
+			
 			// Render the entity
 			// renderer.render(entity, res);
 			renderer.render(res);
@@ -283,9 +304,6 @@ public class OpenGLStart {
 		}
 		
 		/* CLEANUP */
-		// Cleanup shader resources
-		// res.getStShader().cleanUp();
-		
 		renderer.cleanUp();
 		
 		// Cleanup buffers (VAO/VBO)

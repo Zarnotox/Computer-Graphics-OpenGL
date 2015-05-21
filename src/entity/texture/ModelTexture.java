@@ -17,12 +17,12 @@ public class ModelTexture {
 	/**
 	 * The amount of shine loss when the camera moves away from the reflected light
 	 */
-	private float shineDamper = 1;
+	private float shineDamper;
 	
 	/**
 	 * The reflectivity of this model
 	 */
-	private float reflectivity = 0;
+	private float reflectivity;
 
 	/**
 	 * @param textureID
@@ -31,6 +31,9 @@ public class ModelTexture {
 	{
 		super();
 		this.textureID = textureID;
+		
+		this.shineDamper = 1;
+		this.reflectivity = 0;
 	}
 
 	/**
