@@ -10,6 +10,8 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.opengl.GL11;
 
+import render.Render;
+
 /**
  * @author Bert
  */
@@ -101,17 +103,11 @@ public class KeyHandler extends GLFWKeyCallback {
 				// Toggle wireframe mode
 				if ( wireframeModeEnabled == true )
 				{
-					// Draw outline only
-					GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
-					// Disable textures
-					GL11.glDisable(GL11.GL_TEXTURE_2D);
+					Render.enableWireFrame();
 				}
 				else
 				{
-					// Draw full triangles
-					GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
-					// Enable textures
-					GL11.glEnable(GL11.GL_TEXTURE_2D);
+					Render.disableWireFrame();
 				}
 				
 				break;

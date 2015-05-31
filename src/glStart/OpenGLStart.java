@@ -107,7 +107,7 @@ public class OpenGLStart {
 		res = new RenderResources();
 		
 		/* CAMERAS */
-		res.setActiveCamera(new MovableCamera(new Vector3f(0, 5, 10), 0, 0, 0));
+		res.setActiveCamera(new MovableCamera(new Vector3f(0, 5, 5), 0, 0, 0));
 		res.addCamera(new MovableCamera(new Vector3f(0, -10, -15), -90, 0, 0));
 		
 		/* LIGHTS */
@@ -242,22 +242,72 @@ public class OpenGLStart {
 		
 		/* OBJECT MODELS */
 		
-		// Create the model
-		Model model = OBJLoader.loadObjModel("res/dragon.obj", loader);
+		/* Dragon model */
+		Model dragonModel = OBJLoader.loadObjModel("res/dragon.obj", loader);
 		// Load the texture
-		ModelTexture texture = new ModelTexture(
+		ModelTexture dragonTexture = new ModelTexture(
 				loader.loadTexture("res/squareTexture_flatColour.png")); // trans_test.png
 		// Link model and texture
-		TexturedModel texturedModel = new TexturedModel(model, texture);
+		TexturedModel dragonTexturedModel = new TexturedModel(dragonModel, dragonTexture);
 		
 		// Reflectivity settings of the model
-		texturedModel.getTexture().setShineDamper(10);
-		texturedModel.getTexture().setReflectivity(1);
+		dragonTexture.setShineDamper(10);
+		dragonTexture.setReflectivity(1);
 		
 		// Generate an entity from the model and texture
-		Entity entity = new Entity(texturedModel, new Vector3f(0, 0, -15), 0, 0, 0, 1);
+		Entity entity = new Entity(dragonTexturedModel, new Vector3f(0, 0, -15), 0, 0, 0,
+				1);
 		// Add the entity to the entity list
 		entityList.add(entity);
+		
+		/* Box model */
+		float[] vertices = {
+		/* First vertex */
+		-0.5f, 0.5f, 0f,
+		/* Second vertex */
+		-0.5f, -0.5f, 0f,
+		/* Third vertex */
+		0.5f, -0.5f, 0f,
+		/* Fourth vertex */
+		0.5f, 0.5f, 0 };
+		
+		// The index telling in what order to draw
+		int[] indices = {
+		/* First */
+		0, 1, 3,
+		/* Second */
+		3, 1, 2 };
+		
+		// Texture coord mappings
+		float[] textureCoords = {
+				// SW
+				0, 0,
+				// NW
+				0, 1,
+				// NE
+				1, 1,
+				// SE
+				1, 0 };
+		
+		float[] normals = {
+			0, -0, 1,
+			0, -0, 1,
+			0, -0, 1,
+			0, -0, 1
+	};
+		
+		// Create the model
+		Model boxModel = loader.loadToVAO(vertices, textureCoords, normals, indices);
+		// Load the texture
+		ModelTexture boxTexture = new ModelTexture(loader.loadTexture("res/trans_test.png")); // trans_test.png
+		boxTexture.setHasTransparency(true);
+		boxTexture.setUseFakeLighting(true);
+		// Link model and texture
+		TexturedModel texturedModel = new TexturedModel(boxModel, boxTexture);
+		// Generate an entity from the model and texture
+		Entity boxEntity = new Entity(texturedModel, new Vector3f(0, 5, 0), 0, 0, 0, 1);
+		
+		entityList.add(boxEntity);
 		
 		/* TERRAINS */
 		// Load grass terrain texture

@@ -18,8 +18,18 @@ uniform sampler2D textureSampler;
 uniform vec3 lightColour;
 uniform float shineDamper;
 uniform float reflectivity;
+uniform float wireframe;
 
 void main(void) {
+
+	// Check for wireframe mode
+	if(wireframe > 0.5) {
+		// Generate the color for this pixel
+		//out_colour = texture(textureSampler, pass_textureCoords);
+		
+		out_colour = vec4(0.7, 0.7, 0.7, 1.0);
+		return;
+	}
 
 	// Normalize vectors first
 	vec3 unitNormal = normalize(surfaceNormal);
@@ -50,7 +60,16 @@ void main(void) {
 	// Calculate the specular colour strength
 	vec3 finalSpecular = dampedFactor * reflectivity * lightColour;
 	
+	// Generate the color for this pixel
+	vec4 textureColour = texture(textureSampler, pass_textureCoords);
+	
+	// Test transparancy
+	if(textureColour.a < 0.5) {
+		// Discard this part of the texture
+		discard;
+	}
+	
 	// Sample the texture pixel on the model
 	// Merge the light colour with the texture
-	out_colour = vec4(diffuse, 1.0) * texture(textureSampler, pass_textureCoords) + vec4(finalSpecular, 1.0);
+	out_colour = vec4(diffuse, 1.0) * textureColour + vec4(finalSpecular, 1.0);
 }

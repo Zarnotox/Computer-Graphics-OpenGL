@@ -61,6 +61,16 @@ public class StaticShader extends ShaderProgram {
 	private int location_reflectivity;
 	
 	/**
+	 * The location of the shader variable useFakeLighting
+	 */
+	private int location_useFakeLighting;
+	
+	/**
+	 * The location of the shader variable wireframe
+	 */
+	private int location_wireframe;
+	
+	/**
 	 * Constructor
 	 */
 	public StaticShader( Loader loader )
@@ -99,6 +109,8 @@ public class StaticShader extends ShaderProgram {
 		location_lightPosition = super.getUniformVarLocation("lightPosition");
 		location_shineDamper = super.getUniformVarLocation("shineDamper");
 		location_reflectivity = super.getUniformVarLocation("reflectivity");
+		location_useFakeLighting = super.getUniformVarLocation("useFakeLighting");
+		location_wireframe = super.getUniformVarLocation("wireframe");
 	}
 	
 	/**
@@ -159,6 +171,24 @@ public class StaticShader extends ShaderProgram {
 		super.loadFloat(location_shineDamper, damper);
 		// Load the reflectivity amount
 		super.loadFloat(location_reflectivity, reflectivity);
+	}
+	
+	/**
+	 * Tell the shader to apply a fake light
+	 * @param useFakeLighting
+	 */
+	public void loadFakeLightingVariable(boolean useFakeLighting) {
+		// Load the variable into the shade
+		super.loadBoolean(location_useFakeLighting, useFakeLighting);
+	}
+	
+	/**
+	 * Tell the shader to render in wireframe mode
+	 * @param wireframe
+	 */
+	public void loadWireframeVariable(boolean wireframe) {
+		// Load the var
+		super.loadBoolean(location_wireframe, wireframe);
 	}
 	
 }

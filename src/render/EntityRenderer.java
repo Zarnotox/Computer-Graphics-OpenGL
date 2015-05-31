@@ -43,7 +43,9 @@ public class EntityRenderer {
 	/**
 	 * 
 	 */
-	public EntityRenderer( DisplayHelper displayHelper, StaticShader shader, Matrix4f projMatrix )
+	public EntityRenderer( DisplayHelper displayHelper,
+			StaticShader shader,
+			Matrix4f projMatrix )
 	{
 		this.displayHelper = displayHelper;
 		this.stShader = shader;
@@ -52,7 +54,7 @@ public class EntityRenderer {
 		// Load the projectionMatrix straight into the shader
 		shader.start();
 		shader.loadProjectionMatrix(projectionMatrix);
-		shader.stop();		
+		shader.stop();
 	}
 	
 	/**
@@ -60,13 +62,13 @@ public class EntityRenderer {
 	 * 
 	 * @param entities
 	 */
-	public void render( Map<TexturedModel, List<Entity>> entities )
+	public void render( Map<TexturedModel, List<Entity>> entities, boolean wireframe )
 	{
 		// Loop the map
 		for (TexturedModel model : entities.keySet())
 		{
 			// Prepare the model
-			prepareTexturedModel(model);
+			prepareTexturedModel(model, wireframe);
 			// Fetch all related entities
 			List<Entity> ent = entities.get(model);
 			// Loop all these entities
@@ -93,9 +95,10 @@ public class EntityRenderer {
 	
 	/**
 	 * Bind all model data
+	 * 
 	 * @param model
 	 */
-	private void prepareTexturedModel( TexturedModel model )
+	private void prepareTexturedModel( TexturedModel model, boolean wireframe )
 	{
 		/* Bind all resources */
 		// Bind the VAO attached to this model
@@ -109,6 +112,18 @@ public class EntityRenderer {
 		
 		// Get the texture
 		ModelTexture texture = model.getTexture();
+		
+		// Check for transparent texture
+		if ( texture.isHasTransparency() )
+		{
+			// Disable culling on transparent textures
+			Render.disableCulling();
+		}
+		
+		// Wireframe mode
+		stShader.loadWireframeVariable(wireframe);
+		// Fake lighting
+		stShader.loadFakeLightingVariable(texture.isUseFakeLighting());
 		// Reflectivity
 		stShader.loadShineVariables(texture.getShineDamper(), texture.getReflectivity());
 		// Activate the first texture bank, the 2DSampler (Shader) uses this one
@@ -122,6 +137,9 @@ public class EntityRenderer {
 	 */
 	private void unbindTexturedModel()
 	{
+		// Reenable culling
+		Render.enableCulling();
+		
 		/* Unbind all used resources */
 		// Unbind the position VBO
 		GL20.glDisableVertexAttribArray(Render.POSITION_ATTR_INDEX);
@@ -136,6 +154,7 @@ public class EntityRenderer {
 	
 	/**
 	 * Load entity specific data to the shader
+	 * 
 	 * @param entity
 	 */
 	private void prepareInstance( Entity entity )

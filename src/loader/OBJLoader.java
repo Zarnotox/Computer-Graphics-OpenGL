@@ -123,7 +123,6 @@ public class OBJLoader {
 			verticesArray[vertexPointer++] = vertex.z;
 		}
 		
-		
 		for (int i = 0; i < indices.size(); i++)
 		{
 			indicesArray[i] = indices.get(i);
@@ -134,6 +133,7 @@ public class OBJLoader {
 	
 	/**
 	 * Put each piece of data in the correct place inside the buffers
+	 * 
 	 * @param vertexData
 	 * @param indices
 	 * @param textures
@@ -151,9 +151,17 @@ public class OBJLoader {
 		
 		int currentVertexPointer = Integer.parseInt(vertexData[0]) - 1;
 		indices.add(currentVertexPointer);
-		Vector2f currentTex = textures.get(Integer.parseInt(vertexData[1]) - 1);
-		textureArray[currentVertexPointer * 2] = currentTex.x;
-		textureArray[currentVertexPointer * 2 + 1] = 1 - currentTex.y;
+		try
+		{
+			Vector2f currentTex = textures.get(Integer.parseInt(vertexData[1]) - 1);
+			textureArray[currentVertexPointer * 2] = currentTex.x;
+			textureArray[currentVertexPointer * 2 + 1] = 1 - currentTex.y;
+		}
+		catch (Exception e)
+		{
+			
+		}
+		
 		Vector3f currentNorm = normals.get(Integer.parseInt(vertexData[2]) - 1);
 		normalsArray[currentVertexPointer * 3] = currentNorm.x;
 		normalsArray[currentVertexPointer * 3 + 1] = currentNorm.y;

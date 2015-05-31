@@ -23,6 +23,7 @@ uniform mat4 transformationMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform vec3 lightPosition;
+uniform float useFakeLighting;
 
 void main(void) {
 	
@@ -35,8 +36,17 @@ void main(void) {
 	// Lineair assign vertex coords to texture coords
 	pass_textureCoords = textureCoords;
 	
+	// Copy the normal of this vertex
+	vec3 actualNormal = normal;
+	
+	// Manipulate the normal if we want more light on this vertex
+	if(useFakeLighting > 0.5) {
+		// A vector in the up direction
+		actualNormal = vec3(0.0, 1.0, 0.0);
+	}
+	
 	// Pass the transformed normal of this vertex to the fragment shader
-	surfaceNormal = (transformationMatrix * vec4(normal, 0.0)).xyz;
+	surfaceNormal = (transformationMatrix * vec4(actualNormal, 0.0)).xyz;
 	
 	// Pass the vector towards the light, 
 	toLightVector = lightPosition - worldPosition.xyz;

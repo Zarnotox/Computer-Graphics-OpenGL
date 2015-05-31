@@ -44,14 +44,13 @@ public class CharHandler extends GLFWCharCallback {
 		case 'n':
 			/* DEBUG */
 			// System.out.println("Next cam");
-			
 			// Next camera
 			res.nextCamera();
 			break;
+			
 		case 'p':
 			/* DEBUG */
 			// System.out.println("Prev cam");
-			
 			// Previous camera
 			res.previousCamera();
 			break;

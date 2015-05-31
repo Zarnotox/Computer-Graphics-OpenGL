@@ -23,6 +23,16 @@ public class ModelTexture {
 	 * The reflectivity of this model
 	 */
 	private float reflectivity;
+	
+	/**
+	 * The flag indicating that the attached texture has transparent area's
+	 */
+	private boolean hasTransparency;
+	
+	/**
+	 * The flag indicating that the texture needs to be more evenly lit
+	 */
+	private boolean useFakeLighting;
 
 	/**
 	 * @param textureID
@@ -34,6 +44,10 @@ public class ModelTexture {
 		
 		this.shineDamper = 1;
 		this.reflectivity = 0;
+		
+		this.hasTransparency = false;
+		this.useFakeLighting = false;
+		
 	}
 
 	/**
@@ -74,6 +88,38 @@ public class ModelTexture {
 	public void setReflectivity( float reflectivity )
 	{
 		this.reflectivity = reflectivity;
+	}
+
+	/**
+	 * @return the hasTransparency
+	 */
+	public boolean isHasTransparency()
+	{
+		return this.hasTransparency;
+	}
+
+	/**
+	 * @param hasTransparency the hasTransparency to set
+	 */
+	public void setHasTransparency( boolean hasTransparency )
+	{
+		this.hasTransparency = hasTransparency;
+	}
+
+	/**
+	 * @return the useFakeLighting
+	 */
+	public boolean isUseFakeLighting()
+	{
+		return this.useFakeLighting;
+	}
+
+	/**
+	 * @param useFakeLighting the useFakeLighting to set
+	 */
+	public void setUseFakeLighting( boolean useFakeLighting )
+	{
+		this.useFakeLighting = useFakeLighting;
 	}
 	
 	

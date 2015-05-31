@@ -77,7 +77,6 @@ public class Render {
 	 */
 	private Matrix4f projectionMatrix;
 	
-	
 	/* RENDERERS */
 	
 	/**
@@ -90,7 +89,6 @@ public class Render {
 	 */
 	private TerrainRenderer terrainRenderer;
 	
-	
 	/* SHADERS */
 	
 	/**
@@ -102,7 +100,6 @@ public class Render {
 	 * The shader for the terrain
 	 */
 	private TerrainShader terrainShader;
-	
 	
 	/* ENTITY LISTS */
 	
@@ -117,10 +114,17 @@ public class Render {
 	private List<Terrain> terrainList;
 	
 	/**
+	 * Flag indicating that there has to be drawn in wireframe mode
+	 */
+	private static boolean wireframeEnabled;
+	
+	/**
 	 * Constructor
 	 */
 	public Render( DisplayHelper displayHelper, Loader loader )
 	{
+		wireframeEnabled = false;
+		
 		// Assign values
 		this.displayHelper = displayHelper;
 		this.entityMap = new HashMap<>();
@@ -141,10 +145,8 @@ public class Render {
 		this.terrainRenderer = new TerrainRenderer(displayHelper, this.terrainShader,
 				projectionMatrix);
 		
-		/* OpenGL props */
-		// Don't render backwards facing vertices
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glCullFace(GL11.GL_BACK);
+		// Don't draw backwards facing primitives
+		enableCulling();
 	}
 	
 	/**
@@ -170,7 +172,7 @@ public class Render {
 		// Load the camera
 		entityShader.loadviewMatrix(cam);
 		// Render
-		entityRenderer.render(entityMap);
+		entityRenderer.render(entityMap, wireframeEnabled);
 		// Stop the shader program
 		entityShader.stop();
 		
@@ -187,6 +189,52 @@ public class Render {
 		this.terrainList.clear();
 	}
 	
+	/**
+	 * Don't draw backwards facing primitives
+	 */
+	public static void enableCulling()
+	{
+		// Don't render backwards facing vertices
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glCullFace(GL11.GL_BACK);
+	}
+	
+	/**
+	 * Draw backwards facing primitives
+	 * This function can be called to draw models with transparent textures, this improves
+	 * visibility
+	 */
+	public static void disableCulling()
+	{
+		GL11.glDisable(GL11.GL_CULL_FACE);
+	}
+	
+	/**
+	 * Enables wireframe mode
+	 */
+	public static void enableWireFrame()
+	{
+		// Draw outline only
+		GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
+		// Disable textures
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		
+		wireframeEnabled = true;
+	}
+	
+	/**
+	 * Disables wireframe mode
+	 */
+	public static void disableWireFrame()
+	{
+		// Draw full triangles
+		GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+		// Enable textures
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		
+		wireframeEnabled = false;
+	}
+
 	/**
 	 * Prepares the OpenGL context
 	 */
