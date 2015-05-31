@@ -1,7 +1,7 @@
 /**
  * 
  */
-package glCode;
+package glStart;
 
 import java.util.ArrayList;
 import java.util.List;

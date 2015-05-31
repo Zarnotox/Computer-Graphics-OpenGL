@@ -4,10 +4,11 @@
 package callbacks;
 
 import entity.camera.Camera;
-import glCode.RenderResources;
+import glStart.RenderResources;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
+import org.lwjgl.opengl.GL11;
 
 /**
  * @author Bert
@@ -25,6 +26,11 @@ public class KeyHandler extends GLFWKeyCallback {
 	private RenderResources res;
 	
 	/**
+	 * The flag for wireframe rendering
+	 */
+	private boolean wireframeModeEnabled;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param res
@@ -32,6 +38,7 @@ public class KeyHandler extends GLFWKeyCallback {
 	public KeyHandler( RenderResources res )
 	{
 		this.res = res;
+		wireframeModeEnabled = false;
 	}
 	
 	/*
@@ -78,6 +85,35 @@ public class KeyHandler extends GLFWKeyCallback {
 			case GLFW.GLFW_KEY_S:
 				// Move forward along the z axis
 				activeCam.moveOut(CAMERA_MOVEMENT_STEPSIZE);
+				break;
+			case GLFW.GLFW_KEY_F1:
+				// Previous camera
+				res.previousCamera();
+				break;
+			case GLFW.GLFW_KEY_F2:
+				// Next camera
+				res.nextCamera();
+				break;
+			case GLFW.GLFW_KEY_F3:
+				// Switch flag
+				wireframeModeEnabled = !wireframeModeEnabled;
+				
+				// Toggle wireframe mode
+				if ( wireframeModeEnabled == true )
+				{
+					// Draw outline only
+					GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
+					// Disable textures
+					GL11.glDisable(GL11.GL_TEXTURE_2D);
+				}
+				else
+				{
+					// Draw full triangles
+					GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+					// Enable textures
+					GL11.glEnable(GL11.GL_TEXTURE_2D);
+				}
+				
 				break;
 			}
 		}

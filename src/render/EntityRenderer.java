@@ -18,7 +18,7 @@ import shader.StaticShader;
 import entity.Entity;
 import entity.model.TexturedModel;
 import entity.texture.ModelTexture;
-import glCode.DisplayHelper;
+import glStart.DisplayHelper;
 
 /**
  * @author Bert

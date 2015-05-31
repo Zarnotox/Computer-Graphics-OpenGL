@@ -1,4 +1,4 @@
-import glCode.OpenGLStart;
+import glStart.OpenGLStart;
 
 /**
  * 

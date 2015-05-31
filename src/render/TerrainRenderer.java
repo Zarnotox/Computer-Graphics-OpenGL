@@ -12,7 +12,7 @@ import org.lwjgl.opengl.GL30;
 
 import entity.model.Model;
 import entity.texture.ModelTexture;
-import glCode.DisplayHelper;
+import glStart.DisplayHelper;
 import math.Maths;
 import math.matrix.Matrix4f;
 import math.vector.Vector3f;

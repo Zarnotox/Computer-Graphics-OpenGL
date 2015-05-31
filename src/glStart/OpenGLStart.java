@@ -1,7 +1,7 @@
 /**
  * 
  */
-package glCode;
+package glStart;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -107,7 +107,7 @@ public class OpenGLStart {
 		res = new RenderResources();
 		
 		/* CAMERAS */
-		res.setActiveCamera(new MovableCamera(new Vector3f(0, 3, 0), 0, 0, 0));
+		res.setActiveCamera(new MovableCamera(new Vector3f(0, 5, 10), 0, 0, 0));
 		res.addCamera(new MovableCamera(new Vector3f(0, -10, -15), -90, 0, 0));
 		
 		/* LIGHTS */
@@ -182,8 +182,8 @@ public class OpenGLStart {
 		}
 		
 		// Set window specs
-		int windowWidth = 400;
-		int windowHeight = 400;
+		int windowWidth = 700;
+		int windowHeight = 700;
 		// The window title
 		String windowTitle = "Title";
 		
@@ -264,8 +264,8 @@ public class OpenGLStart {
 		ModelTexture terrainTexture = new ModelTexture(
 				loader.loadTexture("res/squareTexture_flatColour.png"));
 		// Generate new terrain
-		Terrain terrain = new Terrain(0, 0, loader, terrainTexture);
-		Terrain terrain2 = new Terrain(1, 0, loader, terrainTexture);
+		Terrain terrain = new Terrain(-1, -1, loader, terrainTexture);
+		Terrain terrain2 = new Terrain(0, -1, loader, terrainTexture);
 		// Add the terrain to the list
 		terrainList.add(terrain);
 		terrainList.add(terrain2);
@@ -273,11 +273,8 @@ public class OpenGLStart {
 		// Loop till the user wants to close the window
 		while (glfwWindowShouldClose(windowHelper.getHandle()) == GL_FALSE)
 		{
-			// Prepare for rendering the scene
-			// renderer.prepare();
 			
 			// Update entity
-			// entity.increasePosition(0, 0, -0.005f);
 			entity.increaseRotation(0, 1, 0);
 			
 			// Load all entities into the scene
@@ -293,7 +290,6 @@ public class OpenGLStart {
 			}
 			
 			// Render the entity
-			// renderer.render(entity, res);
 			renderer.render(res);
 			
 			// Swap the buffer / show the rendered stuff

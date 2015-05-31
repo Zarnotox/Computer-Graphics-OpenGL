@@ -3,7 +3,7 @@
  */
 package callbacks;
 
-import glCode.RenderResources;
+import glStart.RenderResources;
 
 import org.lwjgl.glfw.GLFWCharCallback;
 

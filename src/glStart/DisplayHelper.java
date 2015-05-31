@@ -1,7 +1,7 @@
 /**
  * 
  */
-package glCode;
+package glStart;
 
 import static org.lwjgl.glfw.GLFW.glfwGetWindowSize;
 

@@ -53,7 +53,7 @@ public class Terrain {
 		// Calculate the x coord
 		this.x = gridX * SIZE;
 		// Calculate the z coord
-		this.z = gridX * SIZE;
+		this.z = gridZ * SIZE;
 		
 		// Generate a terrain model
 		this.model = generateTerrain(loader);
@@ -83,7 +83,7 @@ public class Terrain {
 				// Add vertices
 				vertices[vertexPointer * 3] = (float) j / ((float) VERTEX_COUNT - 1)
 						* SIZE;
-				vertices[vertexPointer * 3 + 1] = 0;
+				vertices[vertexPointer * 3 + 1] = 0; // Y coord is always 0
 				vertices[vertexPointer * 3 + 2] = (float) i / ((float) VERTEX_COUNT - 1)
 						* SIZE;
 				
