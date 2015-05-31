@@ -9,6 +9,7 @@ import entity.light.Light;
 import loader.Loader;
 import math.Maths;
 import math.matrix.Matrix4f;
+import math.vector.Vector3f;
 
 /**
  * @author Bert
@@ -62,6 +63,11 @@ public class TerrainShader extends ShaderProgram {
 	private int location_reflectivity;
 	
 	/**
+	 * The location of the shader variable skycolour
+	 */
+	private int location_skyColour;
+	
+	/**
 	 * Constructor
 	 */
 	public TerrainShader( Loader loader )
@@ -100,6 +106,8 @@ public class TerrainShader extends ShaderProgram {
 		location_lightPosition = super.getUniformVarLocation("lightPosition");
 		location_shineDamper = super.getUniformVarLocation("shineDamper");
 		location_reflectivity = super.getUniformVarLocation("reflectivity");
+		
+		location_skyColour = super.getUniformVarLocation("skyColour");
 	}
 	
 	/**
@@ -160,6 +168,15 @@ public class TerrainShader extends ShaderProgram {
 		super.loadFloat(location_shineDamper, damper);
 		// Load the reflectivity amount
 		super.loadFloat(location_reflectivity, reflectivity);
+	}
+	
+	/**
+	 * Add a sky colour to the shader
+	 * @param sky
+	 */
+	public void loadSkyColour(Vector3f sky) {
+		// Load the var
+		super.loadVector(location_skyColour, sky);
 	}
 	
 }

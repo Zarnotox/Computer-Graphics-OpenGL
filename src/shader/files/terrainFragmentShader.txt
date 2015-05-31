@@ -7,8 +7,10 @@ in vec2 pass_textureCoords;
 in vec3 surfaceNormal;
 // The vector towards the light
 in vec3 toLightVector;
-
+// Vector towards the camera
 in vec3 toCameraVector;
+// Visibility factor
+in float visibility;
 
 // output the color of the pixel
 out vec4 out_colour;
@@ -18,6 +20,7 @@ uniform sampler2D textureSampler;
 uniform vec3 lightColour;
 uniform float shineDamper;
 uniform float reflectivity;
+uniform vec3 skyColour;
 
 void main(void) {
 
@@ -58,4 +61,7 @@ void main(void) {
 	// Sample the texture pixel on the model
 	// Merge the light colour with the texture
 	out_colour = vec4(diffuse, 1.0) * texture(textureSampler, pass_textureCoords) + vec4(finalSpecular, 1.0);
+	
+	// Add the skycolour to the final pixel colour
+	out_colour = mix(vec4(skyColour,1.0), out_colour, visibility);
 }

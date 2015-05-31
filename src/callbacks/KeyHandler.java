@@ -20,7 +20,7 @@ public class KeyHandler extends GLFWKeyCallback {
 	/**
 	 * The amount of pixels the camera moves into a certain direction for each callback
 	 */
-	public final static float CAMERA_MOVEMENT_STEPSIZE = 0.1f;
+	public final static float CAMERA_MOVEMENT_STEPSIZE = 0.5f;
 	
 	/**
 	 * The resources for the rendering

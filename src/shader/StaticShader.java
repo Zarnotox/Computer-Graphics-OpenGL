@@ -8,6 +8,7 @@ import entity.light.Light;
 import loader.Loader;
 import math.Maths;
 import math.matrix.Matrix4f;
+import math.vector.Vector3f;
 import render.Render;
 
 /**
@@ -71,6 +72,11 @@ public class StaticShader extends ShaderProgram {
 	private int location_wireframe;
 	
 	/**
+	 * The location of the shader variable skycolour
+	 */
+	private int location_skyColour;
+	
+	/**
 	 * Constructor
 	 */
 	public StaticShader( Loader loader )
@@ -111,6 +117,7 @@ public class StaticShader extends ShaderProgram {
 		location_reflectivity = super.getUniformVarLocation("reflectivity");
 		location_useFakeLighting = super.getUniformVarLocation("useFakeLighting");
 		location_wireframe = super.getUniformVarLocation("wireframe");
+		location_skyColour = super.getUniformVarLocation("skyColour");
 	}
 	
 	/**
@@ -189,6 +196,15 @@ public class StaticShader extends ShaderProgram {
 	public void loadWireframeVariable(boolean wireframe) {
 		// Load the var
 		super.loadBoolean(location_wireframe, wireframe);
+	}
+	
+	/**
+	 * Add a sky colour to the shader
+	 * @param sky
+	 */
+	public void loadSkyColour(Vector3f sky) {
+		// Load the var
+		super.loadVector(location_skyColour, sky);
 	}
 	
 }

@@ -25,6 +25,7 @@ import glStart.DisplayHelper;
 import glStart.RenderResources;
 import loader.Loader;
 import math.matrix.Matrix4f;
+import math.vector.Vector3f;
 import shader.StaticShader;
 import shader.TerrainShader;
 import terrain.Terrain;
@@ -77,6 +78,11 @@ public class Render {
 	 */
 	private Matrix4f projectionMatrix;
 	
+	/**
+	 * The object that holds all rendered objects
+	 */
+	private RenderResources resources;
+	
 	/* RENDERERS */
 	
 	/**
@@ -121,8 +127,9 @@ public class Render {
 	/**
 	 * Constructor
 	 */
-	public Render( DisplayHelper displayHelper, Loader loader )
+	public Render( DisplayHelper displayHelper, Loader loader, RenderResources res )
 	{
+		resources = res;
 		wireframeEnabled = false;
 		
 		// Assign values
@@ -155,18 +162,21 @@ public class Render {
 	 * @param light
 	 * @param cam
 	 */
-	public void render( RenderResources res )
+	public void render()
 	{
 		// Prepare the renderer
 		prepare();
 		
 		/* PROPERTIES */
-		Camera cam = res.getActiveCamera();
-		Light sun = res.getLightList().get(0);
+		Camera cam = resources.getActiveCamera();
+		Light sun = resources.getLightList().get(0);
+		Vector3f skyColour = resources.getSkyColour();
 		
 		/* ENTITIES */
 		// Start shader programs
 		entityShader.start();
+		// Load sky
+		entityShader.loadSkyColour(skyColour);
 		// Load lights into the shader
 		entityShader.loadLight(sun);
 		// Load the camera
@@ -179,6 +189,7 @@ public class Render {
 		/* TERRAIN */
 		// Do the same as the entity render cycle
 		terrainShader.start();
+		terrainShader.loadSkyColour(skyColour);
 		terrainShader.loadLight(sun);
 		terrainShader.loadviewMatrix(cam);
 		terrainRenderer.render(terrainList);
@@ -234,7 +245,7 @@ public class Render {
 		
 		wireframeEnabled = false;
 	}
-
+	
 	/**
 	 * Prepares the OpenGL context
 	 */
@@ -246,8 +257,10 @@ public class Render {
 		// Clear the color and depth buffers
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
+		// Fetch the sky colour
+		Vector3f sky = resources.getSkyColour();
 		// Set the base values of the color buffers
-		GL11.glClearColor(0.2f, 0.05f, 0.05f, 1);
+		GL11.glClearColor(sky.x, sky.y, sky.z, 1);
 	}
 	
 	/**

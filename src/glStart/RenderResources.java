@@ -6,6 +6,7 @@ package glStart;
 import java.util.ArrayList;
 import java.util.List;
 
+import math.vector.Vector3f;
 import shader.ShaderProgram;
 import entity.camera.Camera;
 import entity.light.Light;
@@ -46,12 +47,20 @@ public class RenderResources {
 	private List<Light> lightList;
 	
 	/**
+	 * The colour of the sky
+	 */
+	private Vector3f skyColour;
+	
+	/**
 	 * Constructor
 	 */
 	public RenderResources( )
 	{
 		
 		//this.stShader = shader;
+		
+		// Standard sky colour
+		skyColour = new Vector3f(0, 0, 0);
 		
 		// Generate lists
 		cameraList = new ArrayList<>();
@@ -193,6 +202,22 @@ public class RenderResources {
 	public List<Light> getLightList()
 	{
 		return this.lightList;
+	}
+
+	/**
+	 * @return the skyColour
+	 */
+	public Vector3f getSkyColour()
+	{
+		return this.skyColour;
+	}
+
+	/**
+	 * @param skyColour the skyColour to set
+	 */
+	public void setSkyColour( Vector3f skyColour )
+	{
+		this.skyColour = skyColour;
 	}
 	
 }

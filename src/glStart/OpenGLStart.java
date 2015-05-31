@@ -84,6 +84,67 @@ public class OpenGLStart {
 	/**
 	 * 
 	 */
+	private void init()
+	{
+		System.out.println("Initialising windows");
+		
+		// Set a callback handler
+		errorHandler = errorCallbackPrint(System.err);
+		glfwSetErrorCallback(errorHandler);
+		
+		// Initialize the GLFW core
+		if ( glfwInit() != GL11.GL_TRUE )
+		{
+			throw new IllegalStateException("Could not initialize GLFW");
+		}
+		
+		// Set window specs
+		int windowWidth = 700;
+		int windowHeight = 700;
+		// The window title
+		String windowTitle = "OpenGL project";
+		
+		glfwDefaultWindowHints();
+		// Make the window invisible on creation
+		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+		// Mark the window as resizable
+		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+		
+		// Get the windowhandle
+		long windowHandle = glfwCreateWindow(windowWidth, windowHeight, windowTitle,
+				NULL, NULL);
+		// Check the handle
+		if ( windowHandle == NULL )
+		{
+			throw new RuntimeException("Could not create the GLFW window");
+		}
+		
+		// Generate a displayhelper object for the created window
+		windowHelper = new DisplayHelper(windowHandle);
+		
+		/* Get the real dimensions of the window */
+		Dimension d = windowHelper.getWindowDimensions();
+		windowWidth = (int) d.getWidth();
+		windowHeight = (int) d.getHeight();
+		
+		// Fetch the graphical details of the primary monitor
+		ByteBuffer videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		int centerWidth = (GLFWvidmode.width(videoMode) - windowWidth) / 2;
+		int centerHeight = (GLFWvidmode.height(videoMode) - windowHeight) / 2;
+		// Center the created window
+		glfwSetWindowPos(windowHandle, centerWidth, centerHeight);
+		
+		// Create the OpenGL context
+		glfwMakeContextCurrent(windowHandle);
+		// Enable v-sync
+		glfwSwapInterval(1); // Swap buffer on every framepush
+		// Make the window visible
+		glfwShowWindow(windowHandle);
+	}
+	
+	/**
+	 * 
+	 */
 	public void run()
 	{
 		System.out.println("Launching OpenGL");
@@ -167,74 +228,13 @@ public class OpenGLStart {
 	/**
 	 * 
 	 */
-	private void init()
-	{
-		System.out.println("Initialising windows");
-		
-		// Set a callback handler
-		errorHandler = errorCallbackPrint(System.err);
-		glfwSetErrorCallback(errorHandler);
-		
-		// Initialize the GLFW core
-		if ( glfwInit() != GL11.GL_TRUE )
-		{
-			throw new IllegalStateException("Could not initialize GLFW");
-		}
-		
-		// Set window specs
-		int windowWidth = 700;
-		int windowHeight = 700;
-		// The window title
-		String windowTitle = "Title";
-		
-		glfwDefaultWindowHints();
-		// Make the window invisible on creation
-		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-		// Mark the window as resizable
-		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-		
-		// Get the windowhandle
-		long windowHandle = glfwCreateWindow(windowWidth, windowHeight, windowTitle,
-				NULL, NULL);
-		// Check the handle
-		if ( windowHandle == NULL )
-		{
-			throw new RuntimeException("Could not create the GLFW window");
-		}
-		
-		// Generate a displayhelper object for the created window
-		windowHelper = new DisplayHelper(windowHandle);
-		
-		/* Get the real dimensions of the window */
-		Dimension d = windowHelper.getWindowDimensions();
-		windowWidth = (int) d.getWidth();
-		windowHeight = (int) d.getHeight();
-		
-		// Fetch the graphical details of the primary monitor
-		ByteBuffer videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-		int centerWidth = (GLFWvidmode.width(videoMode) - windowWidth) / 2;
-		int centerHeight = (GLFWvidmode.height(videoMode) - windowHeight) / 2;
-		// Center the created window
-		glfwSetWindowPos(windowHandle, centerWidth, centerHeight);
-		
-		// Create the OpenGL context
-		glfwMakeContextCurrent(windowHandle);
-		// Enable v-sync
-		glfwSwapInterval(1); // Swap buffer on every framepush
-		// Make the window visible
-		glfwShowWindow(windowHandle);
-	}
-	
-	/**
-	 * 
-	 */
 	private void loop()
 	{
 		System.out.println("Running loop");
 		
 		// Create a new Renderer
 		// EntityRenderer renderer = new EntityRenderer(windowHelper, res.getStShader());
-		Render renderer = new Render(windowHelper, loader);
+		Render renderer = new Render(windowHelper, loader, res);
 		
 		// Generate an entitylist to render
 		List<Entity> entityList = new ArrayList<>();
@@ -255,10 +255,16 @@ public class OpenGLStart {
 		dragonTexture.setReflectivity(1);
 		
 		// Generate an entity from the model and texture
-		Entity entity = new Entity(dragonTexturedModel, new Vector3f(0, 0, -15), 0, 0, 0,
-				1);
+		Entity dragonEntity1 = new Entity(dragonTexturedModel, new Vector3f(-10, 0, -15),
+				0, 0, 0, 1);
 		// Add the entity to the entity list
-		entityList.add(entity);
+		entityList.add(dragonEntity1);
+		
+		// Generate an entity from the model and texture
+		Entity dragonEntity2 = new Entity(dragonTexturedModel, new Vector3f(10, 0, -15),
+				0, 0, 0, 1);
+		// Add the entity to the entity list
+		entityList.add(dragonEntity2);
 		
 		/* Box model */
 		float[] vertices = {
@@ -289,17 +295,13 @@ public class OpenGLStart {
 				// SE
 				1, 0 };
 		
-		float[] normals = {
-			0, -0, 1,
-			0, -0, 1,
-			0, -0, 1,
-			0, -0, 1
-	};
+		float[] normals = { 0, -0, 1, 0, -0, 1, 0, -0, 1, 0, -0, 1 };
 		
 		// Create the model
 		Model boxModel = loader.loadToVAO(vertices, textureCoords, normals, indices);
 		// Load the texture
-		ModelTexture boxTexture = new ModelTexture(loader.loadTexture("res/trans_test.png")); // trans_test.png
+		ModelTexture boxTexture = new ModelTexture(
+				loader.loadTexture("res/trans_test.png")); // trans_test.png
 		boxTexture.setHasTransparency(true);
 		boxTexture.setUseFakeLighting(true);
 		// Link model and texture
@@ -316,16 +318,23 @@ public class OpenGLStart {
 		// Generate new terrain
 		Terrain terrain = new Terrain(-1, -1, loader, terrainTexture);
 		Terrain terrain2 = new Terrain(0, -1, loader, terrainTexture);
+		Terrain terrain3 = new Terrain(-1, 0, loader, terrainTexture);
+		Terrain terrain4 = new Terrain(0, 0, loader, terrainTexture);
+		
 		// Add the terrain to the list
 		terrainList.add(terrain);
 		terrainList.add(terrain2);
+		terrainList.add(terrain3);
+		terrainList.add(terrain4);
 		
 		// Loop till the user wants to close the window
 		while (glfwWindowShouldClose(windowHelper.getHandle()) == GL_FALSE)
 		{
 			
 			// Update entity
-			entity.increaseRotation(0, 1, 0);
+			dragonEntity1.increaseRotation(0, 1, 0);
+			dragonEntity2.increaseRotation(0, -1, 0);
+			boxEntity.increaseRotation(0, 1, 0);
 			
 			// Load all entities into the scene
 			for (Entity e : entityList)
@@ -340,7 +349,7 @@ public class OpenGLStart {
 			}
 			
 			// Render the entity
-			renderer.render(res);
+			renderer.render();
 			
 			// Swap the buffer / show the rendered stuff
 			glfwSwapBuffers(windowHelper.getHandle());
