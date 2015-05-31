@@ -282,39 +282,9 @@ public class OpenGLStart {
 		// Add the entity to the entity list
 		entityList.add(dragonEntity2);
 		
-		/* Box model */
-		float[] vertices = {
-		/* First vertex */
-		-0.5f, 0.5f, 0f,
-		/* Second vertex */
-		-0.5f, -0.5f, 0f,
-		/* Third vertex */
-		0.5f, -0.5f, 0f,
-		/* Fourth vertex */
-		0.5f, 0.5f, 0 };
-		
-		// The index telling in what order to draw
-		int[] indices = {
-		/* First */
-		0, 1, 3,
-		/* Second */
-		3, 1, 2 };
-		
-		// Texture coord mappings
-		float[] textureCoords = {
-				// SW
-				0, 0,
-				// NW
-				0, 1,
-				// NE
-				1, 1,
-				// SE
-				1, 0 };
-		
-		float[] normals = { 0, -0, 1, 0, -0, 1, 0, -0, 1, 0, -0, 1 };
-		
+		/* Rectangle model */		
 		// Create the model
-		Model boxModel = loader.loadToVAO(vertices, textureCoords, normals, indices);
+		Model boxModel = OBJLoader.loadObjModel("res/rectangle.obj", loader);
 		// Load the texture
 		ModelTexture boxTexture = new ModelTexture(
 				loader.loadTexture("res/trans_test.png")); // trans_test.png
@@ -346,8 +316,10 @@ public class OpenGLStart {
 		// Set sky colour
 		res.setSkyColour(new Vector3f(0.4f, 0.1f, 0.2f));
 		
+		// Fetch window handle
+		long windowHandle = windowHelper.getHandle();
 		// Loop till the user wants to close the window
-		while (glfwWindowShouldClose(windowHelper.getHandle()) == GL_FALSE)
+		while (glfwWindowShouldClose(windowHandle) == GL_FALSE)
 		{
 			
 			// Update entity
@@ -371,7 +343,7 @@ public class OpenGLStart {
 			renderer.render();
 			
 			// Swap the buffer / show the rendered stuff
-			glfwSwapBuffers(windowHelper.getHandle());
+			glfwSwapBuffers(windowHandle);
 			
 			// Poll for events, interrupts and such get handled
 			glfwPollEvents();

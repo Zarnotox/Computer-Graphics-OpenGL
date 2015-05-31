@@ -1,7 +1,7 @@
 #version 400 core
 
 // Some fog values
-const float density = 0.008;
+const float density = 0.008 ;
 const float gradient = 5;
 
 // Variables from the VAO
