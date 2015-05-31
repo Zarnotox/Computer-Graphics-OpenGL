@@ -20,6 +20,7 @@ import math.vector.Vector3f;
 import org.lwjgl.glfw.GLFWCharCallback;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
+import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
@@ -29,6 +30,7 @@ import shader.StaticShader;
 import terrain.Terrain;
 import callbacks.CharHandler;
 import callbacks.KeyHandler;
+import callbacks.ResizeHandler;
 import entity.Entity;
 import entity.camera.MovableCamera;
 import entity.light.Light;
@@ -62,6 +64,11 @@ public class OpenGLStart {
 	 * Class that handles character interrupts
 	 */
 	private GLFWCharCallback charCallback;
+	
+	/**
+	 * Resize handler
+	 */
+	private GLFWWindowSizeCallback resizeCallback;
 	
 	/**
 	 * The object that holds resources for rendering
@@ -133,7 +140,7 @@ public class OpenGLStart {
 		int centerHeight = (GLFWvidmode.height(videoMode) - windowHeight) / 2;
 		// Center the created window
 		glfwSetWindowPos(windowHandle, centerWidth, centerHeight);
-		
+				
 		// Create the OpenGL context
 		glfwMakeContextCurrent(windowHandle);
 		// Enable v-sync
@@ -175,7 +182,7 @@ public class OpenGLStart {
 		res.addLight(new Light(new Vector3f(3000, 2000, 2000), new Vector3f(1, 1, 1)));
 		
 		// Generate Keyhandlers
-		initInputhandlers();
+		initCallbackHandlers();
 		
 		// Run the loop
 		loop();
@@ -193,17 +200,26 @@ public class OpenGLStart {
 	/**
 	 * Initialise inputhandlers
 	 */
-	private void initInputhandlers()
+	private void initCallbackHandlers()
 	{
+		// WindowHandle
+		long windowHandle = windowHelper.getHandle();
+		
+		// The handler for window resizing
+		resizeCallback = new ResizeHandler(res);
+		
 		// The handler for key events
 		keyCallback = new KeyHandler(res);
 		
 		// The handler for char events
 		charCallback = new CharHandler(res);
 		
+		// Create a resize callback
+		glfwSetWindowSizeCallback(windowHandle, resizeCallback);
+		
 		// Add handlers to the window
-		glfwSetKeyCallback(windowHelper.getHandle(), keyCallback);
-		glfwSetCharCallback(windowHelper.getHandle(), charCallback);
+		glfwSetKeyCallback(windowHandle, keyCallback);
+		glfwSetCharCallback(windowHandle, charCallback);
 	}
 	
 	/**
@@ -326,6 +342,9 @@ public class OpenGLStart {
 		terrainList.add(terrain2);
 		terrainList.add(terrain3);
 		terrainList.add(terrain4);
+		
+		// Set sky colour
+		res.setSkyColour(new Vector3f(0.4f, 0.1f, 0.2f));
 		
 		// Loop till the user wants to close the window
 		while (glfwWindowShouldClose(windowHelper.getHandle()) == GL_FALSE)
