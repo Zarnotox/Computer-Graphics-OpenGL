@@ -3,13 +3,13 @@
  */
 package callbacks;
 
-import entity.camera.Camera;
 import glStart.RenderResources;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.opengl.GL11;
 
+import camera.Camera;
 import render.Render;
 
 /**

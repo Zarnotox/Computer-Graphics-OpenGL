@@ -3,7 +3,7 @@
  */
 package shader;
 
-import entity.camera.Camera;
+import camera.Camera;
 import entity.light.Light;
 import loader.Loader;
 import math.Maths;

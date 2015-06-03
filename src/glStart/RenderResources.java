@@ -6,9 +6,9 @@ package glStart;
 import java.util.ArrayList;
 import java.util.List;
 
+import camera.Camera;
 import math.vector.Vector3f;
 import shader.ShaderProgram;
-import entity.camera.Camera;
 import entity.light.Light;
 
 /**

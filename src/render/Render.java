@@ -17,8 +17,8 @@ import javax.annotation.Generated;
 
 import org.lwjgl.opengl.GL11;
 
+import camera.Camera;
 import entity.Entity;
-import entity.camera.Camera;
 import entity.light.Light;
 import entity.model.TexturedModel;
 import glStart.DisplayHelper;

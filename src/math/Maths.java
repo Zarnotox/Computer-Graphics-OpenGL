@@ -3,7 +3,7 @@
  */
 package math;
 
-import entity.camera.Camera;
+import camera.Camera;
 import math.matrix.Matrix4f;
 import math.vector.Vector3f;
 
