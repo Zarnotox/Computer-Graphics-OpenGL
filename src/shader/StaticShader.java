@@ -148,9 +148,9 @@ public class StaticShader extends ShaderProgram {
 	public void loadviewMatrix( Camera camera )
 	{
 		// Generate the viewmatrix based on the camera
-		Matrix4f matrix = Maths.createViewMatrix(camera);
+		//Matrix4f matrix = Maths.createViewMatrix(camera);
 		// Store the viewmatrix
-		super.loadMatrix(location_viewMatrix, matrix);
+		super.loadMatrix(location_viewMatrix, camera.getViewMatrix());
 	}
 	
 	/**

@@ -175,8 +175,8 @@ public class OpenGLStart {
 		res = new RenderResources();
 		
 		/* CAMERAS */
-		res.setActiveCamera(new MovableCamera(new Vector3f(0, 5, 5), 0, 0, 0));
 		res.addCamera(new MovableCamera(new Vector3f(0, -10, -15), -90, 0, 0));
+		res.setActiveCamera(new MovableCamera(new Vector3f(0, 5, 5), 0, 0, 0));
 		
 		/* LIGHTS */
 		res.addLight(new Light(new Vector3f(3000, 2000, 2000), new Vector3f(1, 1, 1)));

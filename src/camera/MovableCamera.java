@@ -12,6 +12,11 @@ import math.vector.Vector3f;
 public class MovableCamera extends Camera {
 	
 	/**
+	 * The vector object used for calculations
+	 */
+	private Vector3f vecBuffer;
+	
+	/**
 	 * @param position
 	 * @param pitch
 	 * @param yaw
@@ -20,45 +25,66 @@ public class MovableCamera extends Camera {
 	public MovableCamera( Vector3f position, float pitch, float yaw, float roll )
 	{
 		super(position, pitch, yaw, roll);
+		
+		vecBuffer = new Vector3f();
 	}
 
 	/* (non-Javadoc)
 	 * @see camera.Camera#move(float, float, float)
 	 */
 	@Override
-	public void move( float dx, float dy, float dz )
+	public void moveRelative( float dx, float dy, float dz )
 	{
-		super.position.x += dx;
-		super.position.y += dy;
-		super.position.z += dz;		
+		super.updatePosition(dx, dy, dz);
 	}
 
 	/* (non-Javadoc)
 	 * @see camera.Camera#moveHorizontal(float)
 	 */
-	@Override
-	public void moveHorizontal( float dx )
+
+	/*public void moveForward( float dx )
 	{
-		super.position.x += dx;		
-	}
+		// Get the vector between the target and the camera
+		super.getCamDirectionVector(vecBuffer);
+		
+		 DEBUG 
+		System.out.println("Direction vector: " + vecBuffer.toString());
+		
+		// Normalize the vector and scale it with the delta value
+		vecBuffer.normalise().scale(dx);
+		
+		// Add the move vector to the current position
+		super.updatePosition(vecBuffer.x, vecBuffer.y, vecBuffer.z);
+	}*/
 
 	/* (non-Javadoc)
 	 * @see camera.Camera#moveVertical(float)
 	 */
-	@Override
-	public void moveVertical( float dy )
+	
+	/*public void moveLeft( float dy )
 	{
-		super.position.y += dy;		
+		// Fetch the 
 	}
+*/
+	/* (non-Javadoc)
+	 * @see camera.Camera#rotateHorizontalClockwise(float)
+	 */
+	
+	/*public void rotateHorizontalClockwise( float dx )
+	{
+		super.updateHorAngle(dx);
+		
+	}*/
 
 	/* (non-Javadoc)
-	 * @see camera.Camera#moveOut(float)
+	 * @see camera.Camera#rotateVerticalClockwise(float)
 	 */
-	@Override
-	public void moveOut( float dz )
+	
+	/*public void rotateVerticalClockwise( float dx )
 	{
-		super.position.z += dz;		
-	}
+		super.updateVerAngle(dx);
+		
+	}*/
 	
 	
 	

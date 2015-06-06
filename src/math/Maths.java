@@ -52,25 +52,28 @@ public class Maths {
 	 * @param camera
 	 * @return
 	 */
-	public static Matrix4f createViewMatrix( Camera camera )
+	public static void createViewMatrix( Camera camera, Matrix4f targetMatrix )
 	{
 		// Create the matrix
-		Matrix4f viewMatrix = new Matrix4f();
+		//Matrix4f viewMatrix = new Matrix4f();
 		// Set the matrix to identity
-		viewMatrix.setIdentity();
+		targetMatrix.setIdentity();
 		
 		/* Transform the matrix so it resembles the camera position */
 		// Rotation around axes
-		viewMatrix.rotate((float) Math.toRadians(camera.getPitch()),
+		targetMatrix.rotate((float) Math.toRadians(camera.getPitch()),
 				new Vector3f(1, 0, 0));
-		viewMatrix.rotate((float) Math.toRadians(camera.getYaw()), new Vector3f(0, 1, 0));
-		viewMatrix.rotate((float) Math.toRadians(camera.getRoll()), new Vector3f(0, 0, 1));
+		targetMatrix.rotate((float) Math.toRadians(camera.getYaw()), new Vector3f(0, 1, 0));
+		targetMatrix.rotate((float) Math.toRadians(camera.getRoll()), new Vector3f(0, 0, 1));
 		
 		// Inverse position
 		Vector3f negativeCamerapos = camera.getPosition().negate(null);
-		viewMatrix.translate(negativeCamerapos);
+		targetMatrix.translate(negativeCamerapos);
+		
+		/* DEBUG */
+		System.out.println("ViewMatrix:\n" + targetMatrix.toString());
 		
 		// Return the view matrix
-		return viewMatrix;
+		//return targetMatrix;
 	}
 }

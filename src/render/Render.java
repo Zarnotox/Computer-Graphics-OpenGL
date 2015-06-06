@@ -223,14 +223,17 @@ public class Render {
 	/**
 	 * Enables wireframe mode
 	 */
-	public static void enableWireFrame()
+	public static void enableWireFrame( boolean shaderWireframe )
 	{
 		// Draw outline only
 		GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
 		// Disable textures
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		
-		wireframeEnabled = true;
+		if ( shaderWireframe == true )
+		{
+			wireframeEnabled = true;
+		}
 	}
 	
 	/**

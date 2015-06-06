@@ -36,7 +36,7 @@ public class CharHandler extends GLFWCharCallback {
 		char character = Character.toChars(codepoint)[0];
 		
 		/* DEBUG */
-		System.out.println("Char: " + character);
+		// System.out.println("Char: " + character);
 		
 		// Switch on Unicode keyvalues
 		switch (character) {
@@ -47,7 +47,7 @@ public class CharHandler extends GLFWCharCallback {
 			// Next camera
 			res.nextCamera();
 			break;
-			
+		
 		case 'p':
 			/* DEBUG */
 			// System.out.println("Prev cam");

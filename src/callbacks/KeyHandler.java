@@ -54,7 +54,7 @@ public class KeyHandler extends GLFWKeyCallback {
 		{
 			/* DEBUG */
 			// System.out.println("Window: " + window);
-			System.out.println("Key: " + key);
+			// System.out.println("Key: " + key);
 			// System.out.println("Modifiers: " + Integer.toBinaryString(mods));
 			
 			// Get the active camera
@@ -63,30 +63,36 @@ public class KeyHandler extends GLFWKeyCallback {
 			switch (key) {
 			/* CAMERA MOVEMENT */
 			case GLFW.GLFW_KEY_LEFT:
+				// Rotate left around targetPoint
+				activeCam.updateHorAngle(-CAMERA_MOVEMENT_STEPSIZE);
+				break;
 			case GLFW.GLFW_KEY_A:
 				// Move camera to the left
-				activeCam.moveHorizontal(-CAMERA_MOVEMENT_STEPSIZE);
+				activeCam.moveRight(-CAMERA_MOVEMENT_STEPSIZE);
 				break;
 			case GLFW.GLFW_KEY_RIGHT:
+				// Rotate right around targetPoint
+				activeCam.updateHorAngle(CAMERA_MOVEMENT_STEPSIZE);
+				break;
 			case GLFW.GLFW_KEY_D:
 				// Move camera to the right
-				activeCam.moveHorizontal(CAMERA_MOVEMENT_STEPSIZE);
+				activeCam.moveRight(CAMERA_MOVEMENT_STEPSIZE);
 				break;
 			case GLFW.GLFW_KEY_DOWN:
-				// Move camera down
-				activeCam.moveVertical(-CAMERA_MOVEMENT_STEPSIZE);
+				// Rotate down around targetPoint
+				activeCam.updateVerAngle(CAMERA_MOVEMENT_STEPSIZE);
 				break;
 			case GLFW.GLFW_KEY_UP:
-				// Move camera up
-				activeCam.moveVertical(CAMERA_MOVEMENT_STEPSIZE);
+				// Rotate up around targetpoint
+				activeCam.updateVerAngle(-CAMERA_MOVEMENT_STEPSIZE);
 				break;
 			case GLFW.GLFW_KEY_W:
-				// Move backward along the z axis
-				activeCam.moveOut(-CAMERA_MOVEMENT_STEPSIZE);
+				// Move forward
+				activeCam.moveForward(CAMERA_MOVEMENT_STEPSIZE);
 				break;
 			case GLFW.GLFW_KEY_S:
-				// Move forward along the z axis
-				activeCam.moveOut(CAMERA_MOVEMENT_STEPSIZE);
+				// Move backward
+				activeCam.moveForward(-CAMERA_MOVEMENT_STEPSIZE);
 				break;
 			case GLFW.GLFW_KEY_F1:
 				// Previous camera
@@ -103,7 +109,24 @@ public class KeyHandler extends GLFWKeyCallback {
 				// Toggle wireframe mode
 				if ( wireframeModeEnabled == true )
 				{
-					Render.enableWireFrame();
+					// Set the shader to use wireframe
+					Render.enableWireFrame(true);
+				}
+				else
+				{
+					Render.disableWireFrame();
+				}
+				
+				break;			
+			case GLFW.GLFW_KEY_F4:
+				// Switch flag
+				wireframeModeEnabled = !wireframeModeEnabled;
+				
+				// Toggle wireframe mode
+				if ( wireframeModeEnabled == true )
+				{
+					// Don't set the shaders to wireframe
+					Render.enableWireFrame(false);
 				}
 				else
 				{
