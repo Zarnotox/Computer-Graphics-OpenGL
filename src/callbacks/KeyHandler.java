@@ -60,6 +60,14 @@ public class KeyHandler extends GLFWKeyCallback {
 			
 			switch (key) {
 			/* CAMERA MOVEMENT */
+			case GLFW.GLFW_KEY_KP_8:
+				// Move up
+				activeCam.moveUp(CAMERA_MOVEMENT_STEPSIZE);
+				break;
+			case GLFW.GLFW_KEY_KP_2:
+				// Move down
+				activeCam.moveUp(-CAMERA_MOVEMENT_STEPSIZE);
+				break;			
 			case GLFW.GLFW_KEY_LEFT:
 				// Rotate left around targetPoint
 				activeCam.updateHorAngle(-CAMERA_MOVEMENT_STEPSIZE*10);

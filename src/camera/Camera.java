@@ -410,11 +410,11 @@ public abstract class Camera {
 	public abstract void moveRelative( float dx, float dy, float dz );
 	
 	/**
-	 * Move along the X-axis
+	 * Move along the camera's Z-axis
 	 * 
-	 * @param dx
+	 * @param dz
 	 */
-	public final void moveForward( float dx )
+	public final void moveForward( float dz )
 	{
 		/*
 		 * // Fetch the x axis from the viewmatrix
@@ -440,7 +440,7 @@ public abstract class Camera {
 		
 		// Multiply the axis with the deficit, the Z axis points behind the cam so negate
 		// the value
-		zAxis.scale(-dx);
+		zAxis.scale(-dz);
 		// Add this vector to the current position
 		updateTargetPosition(zAxis.x, zAxis.y, zAxis.z);
 		
@@ -462,11 +462,11 @@ public abstract class Camera {
 	}
 	
 	/**
-	 * Move along the Y-axis
+	 * Move along the camera's X-axis
 	 * 
-	 * @param dy
+	 * @param dx
 	 */
-	public void moveRight( float dy )
+	public void moveRight( float dx )
 	{
 		/*
 		 * // Get the Y axis from the viewmatrix
@@ -488,7 +488,7 @@ public abstract class Camera {
 		System.out.println(viewMatrix.toString());
 		
 		// Multiply with deficit
-		xAxis.scale(dy);
+		xAxis.scale(dx);
 		
 		// Add it to the current position
 		updateTargetPosition(xAxis.x, xAxis.y, xAxis.z);
@@ -499,10 +499,24 @@ public abstract class Camera {
 	}
 	
 	/**
-	 * Move along the Z-axis
+	 * Move along the camera's Y-axis
 	 * 
-	 * @param dz
+	 * @param dy
 	 */
-	// public abstract void moveOut( float dz );
+	public void moveUp( float dy ) {
+		// Get the Y axis
+		Vector3f yAxis = new Vector3f(viewMatrix.m01, viewMatrix.m11, viewMatrix.m12);
+		// Normalize the axis
+		yAxis.normalise();
+		
+		System.out.println("CAMERA Y AXIS: " + yAxis);
+		System.out.println(viewMatrix.toString());
+		
+		// Multiply with deficit
+		yAxis.scale(dy);
+		
+		// Add it to the current position
+		updateTargetPosition(yAxis.x, yAxis.y, yAxis.z);
+	}
 	
 }
