@@ -299,6 +299,9 @@ public abstract class Camera {
 		this.yaw = originalCameraRotations.y;
 		this.roll = originalCameraRotations.z;
 		
+		this.horizontalAngle = -yaw;
+		this.verticalAngle = -pitch;
+		
 		// Recalculate the targetPoint
 		calculateTargetPoint();
 	}
@@ -375,7 +378,7 @@ public abstract class Camera {
 		// Update the yaw
 		horizontalAngle += dx;
 		
-		System.out.println("Horizontal angle: " + horizontalAngle);
+		//System.out.println("Horizontal angle: " + horizontalAngle);
 		
 		// Update the camera position
 		calculateRelativePositionToTarget();
@@ -394,7 +397,7 @@ public abstract class Camera {
 		// Clamp the vertical angle between 0 and 90
 		verticalAngle = Math.max(-90, Math.min(verticalAngle, 90));
 		
-		System.out.println("Vertical angle: " + verticalAngle);
+		//System.out.println("Vertical angle: " + verticalAngle);
 		
 		// Update the camera position
 		calculateRelativePositionToTarget();
@@ -434,9 +437,11 @@ public abstract class Camera {
 		// Normalize the axis
 		zAxis.normalise();
 		
+		/*
 		System.out.println("CAMERA Z AXIS: " + zAxis);
 		System.out.println("Viewmatrix:");
 		System.out.println(viewMatrix.toString());
+		*/
 		
 		// Multiply the axis with the deficit, the Z axis points behind the cam so negate
 		// the value
@@ -484,8 +489,8 @@ public abstract class Camera {
 		// Normalize the axis
 		xAxis.normalise();
 		
-		System.out.println("CAMERA X AXIS: " + xAxis);
-		System.out.println(viewMatrix.toString());
+		//System.out.println("CAMERA X AXIS: " + xAxis);
+		//System.out.println(viewMatrix.toString());
 		
 		// Multiply with deficit
 		xAxis.scale(dx);
@@ -509,8 +514,8 @@ public abstract class Camera {
 		// Normalize the axis
 		yAxis.normalise();
 		
-		System.out.println("CAMERA Y AXIS: " + yAxis);
-		System.out.println(viewMatrix.toString());
+		//System.out.println("CAMERA Y AXIS: " + yAxis);
+		//System.out.println(viewMatrix.toString());
 		
 		// Multiply with deficit
 		yAxis.scale(dy);
