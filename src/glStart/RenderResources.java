@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camera.Camera;
+import math.RayCaster;
 import math.vector.Vector3f;
 import shader.ShaderProgram;
 import entity.light.Light;
@@ -15,6 +16,9 @@ import entity.light.Light;
  * @author Bert
  */
 public class RenderResources {
+	
+	/* PICKER */
+	private RayCaster picker;
 	
 	/* SHADERS */
 	
@@ -218,6 +222,22 @@ public class RenderResources {
 	public void setSkyColour( Vector3f skyColour )
 	{
 		this.skyColour = skyColour;
+	}
+	
+	/**
+	 * Set the mouse picker
+	 * @param r
+	 */
+	public void setPicker(RayCaster r) {
+		this.picker = r;
+	}
+	
+	/**
+	 * Get the mouse picker
+	 * @return
+	 */
+	public RayCaster getPicker() {
+		return this.picker;
 	}
 	
 }

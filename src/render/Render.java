@@ -342,4 +342,12 @@ public class Render {
 		terrainShader.cleanUp();
 	}
 	
+	/**
+	 * Returns the projectionMatrix
+	 * @return
+	 */
+	public Matrix4f getProjectionMatrix() {
+		return projectionMatrix;
+	}
+	
 }

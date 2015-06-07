@@ -15,11 +15,13 @@ import java.util.List;
 
 import loader.Loader;
 import loader.OBJLoader;
+import math.RayCaster;
 import math.vector.Vector3f;
 
 import org.lwjgl.glfw.GLFWCharCallback;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
+import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GL11;
@@ -30,6 +32,7 @@ import shader.StaticShader;
 import terrain.Terrain;
 import callbacks.CharHandler;
 import callbacks.KeyHandler;
+import callbacks.MouseButtonCallback;
 import callbacks.ResizeHandler;
 import camera.MovableCamera;
 import entity.Entity;
@@ -69,6 +72,11 @@ public class OpenGLStart {
 	 * Resize handler
 	 */
 	private GLFWWindowSizeCallback resizeCallback;
+	
+	/**
+	 * Mouse click handler
+	 */
+	private GLFWMouseButtonCallback mouseButtonCallback;
 	
 	/**
 	 * The object that holds resources for rendering
@@ -214,12 +222,16 @@ public class OpenGLStart {
 		// The handler for char events
 		charCallback = new CharHandler(res);
 		
+		// Mouse button callback
+		mouseButtonCallback = new MouseButtonCallback(res);
+		
 		// Create a resize callback
 		glfwSetWindowSizeCallback(windowHandle, resizeCallback);
 		
 		// Add handlers to the window
 		glfwSetKeyCallback(windowHandle, keyCallback);
 		glfwSetCharCallback(windowHandle, charCallback);
+		glfwSetMouseButtonCallback(windowHandle, mouseButtonCallback);
 	}
 	
 	/**
@@ -251,6 +263,12 @@ public class OpenGLStart {
 		// Create a new Renderer
 		// EntityRenderer renderer = new EntityRenderer(windowHelper, res.getStShader());
 		Render renderer = new Render(windowHelper, loader, res);
+		
+		/* Create mouse picker */
+		RayCaster picker = new RayCaster(renderer.getProjectionMatrix(), windowHelper);
+		// Add it to the resources
+		res.setPicker(picker);
+		
 		
 		// Generate an entitylist to render
 		List<Entity> entityList = new ArrayList<>();
