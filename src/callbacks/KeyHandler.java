@@ -7,8 +7,6 @@ import glStart.RenderResources;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
-import org.lwjgl.opengl.GL11;
-
 import camera.Camera;
 import render.Render;
 
@@ -64,7 +62,7 @@ public class KeyHandler extends GLFWKeyCallback {
 			/* CAMERA MOVEMENT */
 			case GLFW.GLFW_KEY_LEFT:
 				// Rotate left around targetPoint
-				activeCam.updateHorAngle(-CAMERA_MOVEMENT_STEPSIZE);
+				activeCam.updateHorAngle(-CAMERA_MOVEMENT_STEPSIZE*10);
 				break;
 			case GLFW.GLFW_KEY_A:
 				// Move camera to the left
@@ -72,7 +70,7 @@ public class KeyHandler extends GLFWKeyCallback {
 				break;
 			case GLFW.GLFW_KEY_RIGHT:
 				// Rotate right around targetPoint
-				activeCam.updateHorAngle(CAMERA_MOVEMENT_STEPSIZE);
+				activeCam.updateHorAngle(CAMERA_MOVEMENT_STEPSIZE*10);
 				break;
 			case GLFW.GLFW_KEY_D:
 				// Move camera to the right
@@ -80,11 +78,11 @@ public class KeyHandler extends GLFWKeyCallback {
 				break;
 			case GLFW.GLFW_KEY_DOWN:
 				// Rotate down around targetPoint
-				activeCam.updateVerAngle(CAMERA_MOVEMENT_STEPSIZE);
+				activeCam.updateVerAngle(CAMERA_MOVEMENT_STEPSIZE*10);
 				break;
 			case GLFW.GLFW_KEY_UP:
 				// Rotate up around targetpoint
-				activeCam.updateVerAngle(-CAMERA_MOVEMENT_STEPSIZE);
+				activeCam.updateVerAngle(-CAMERA_MOVEMENT_STEPSIZE*10);
 				break;
 			case GLFW.GLFW_KEY_W:
 				// Move forward

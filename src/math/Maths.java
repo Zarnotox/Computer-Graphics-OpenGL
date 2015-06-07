@@ -71,7 +71,7 @@ public class Maths {
 		targetMatrix.translate(negativeCamerapos);
 		
 		/* DEBUG */
-		System.out.println("ViewMatrix:\n" + targetMatrix.toString());
+		//System.out.println("ViewMatrix:\n" + targetMatrix.toString());
 		
 		// Return the view matrix
 		//return targetMatrix;

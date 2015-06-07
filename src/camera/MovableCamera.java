@@ -35,7 +35,7 @@ public class MovableCamera extends Camera {
 	@Override
 	public void moveRelative( float dx, float dy, float dz )
 	{
-		super.updatePosition(dx, dy, dz);
+		super.updateTargetPosition(dx, dy, dz);
 	}
 
 	/* (non-Javadoc)

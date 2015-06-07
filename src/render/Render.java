@@ -311,8 +311,8 @@ public class Render {
 		Dimension d = displayHelper.getWindowDimensions();
 		
 		/* DEBUG */
-		System.out.println("Calculating projection matrix");
-		System.out.println("WindowDimensions: " + d.toString());
+		//System.out.println("Calculating projection matrix");
+		//System.out.println("WindowDimensions: " + d.toString());
 		
 		// Prepare matrix variables
 		float aspectRatio = (float) d.getWidth() / (float) d.getHeight();

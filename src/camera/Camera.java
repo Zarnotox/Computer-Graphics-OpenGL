@@ -4,7 +4,6 @@
 package camera;
 
 import math.Maths;
-import math.matrix.Matrix;
 import math.matrix.Matrix4f;
 import math.vector.Vector3f;
 import math.vector.Vector4f;
@@ -89,11 +88,11 @@ public abstract class Camera {
 		
 		this.pitch = pitch;
 		this.yaw = yaw;
-		this.roll = roll;
+		this.roll = 0;
 		
 		this.zoomLevel = STANDARD_ZOOM;
-		this.verticalAngle = 0;
-		this.horizontalAngle = 0;
+		this.verticalAngle = -pitch;
+		this.horizontalAngle = -yaw;
 		
 		this.originalCameraRotations = new Vector3f(pitch, yaw, roll);
 		this.viewMatrix = new Matrix4f();
@@ -104,6 +103,7 @@ public abstract class Camera {
 				+ currentPosition.toString());
 		
 		Maths.createViewMatrix(this, viewMatrix);
+		// Target Point needs the viewmatrix to find it
 		calculateTargetPoint();
 	}
 	
@@ -117,20 +117,20 @@ public abstract class Camera {
 		Matrix4f.invert(viewMatrix, invertedViewMatrix);
 		
 		/* DEBUG */
-		System.out.println("Inverted viewMatrix:");
-		System.out.println(invertedViewMatrix.toString());
+		// System.out.println("Inverted viewMatrix:");
+		// System.out.println(invertedViewMatrix.toString());
 		
 		targetPoint = calculateTargetWorldPosition(invertedViewMatrix);
 		
 		/* DEBUG */
-		System.out.println("New target point: " + targetPoint.toString());
-		System.out.println();
+		//System.out.println("Target point: " + targetPoint.toString());
+		// System.out.println();
 	}
 	
 	/**
 	 * Calculates the position of the targetPoint that the camera is looking at
 	 * 
-	 * @param invView
+	 * @param invView Inverse viewMatrix
 	 * @return
 	 */
 	private Vector3f calculateTargetWorldPosition( Matrix4f invView )
@@ -164,34 +164,36 @@ public abstract class Camera {
 	private void calculateRelativePositionToTarget()
 	{
 		/* Generate rotation matrix */
-		Matrix4f InversePositioning = new Matrix4f();
-		// InversePositioning.setIdentity();
+		Matrix4f inversePositioning = new Matrix4f();
+		inversePositioning.setIdentity();
 		
-		// Rotation around the X axis
-		InversePositioning.rotate((float) Math.toRadians(verticalAngle), new Vector3f(1,
-				0, 0));
 		// Rotation around the Y axis
-		InversePositioning.rotate((float) Math.toRadians(horizontalAngle), new Vector3f(
+		inversePositioning.rotate((float) Math.toRadians(horizontalAngle), new Vector3f(
 				0, 1, 0));
 		
+		// Rotation around the X axis
+		inversePositioning.rotate((float) Math.toRadians(verticalAngle), new Vector3f(1,
+				0, 0));
+		
 		// Move the point to the targetpoint
-		InversePositioning.translate(targetPoint);
+		inversePositioning.translate(targetPoint);
 		// Move the needed point by zoomlevel
-		InversePositioning.translate(new Vector3f(0, 0, zoomLevel));
+		inversePositioning.translate(new Vector3f(0, 0, zoomLevel));
 		
 		// Transform the targetPoint with the generated matrix
-		Vector4f cameraPosition = Matrix4f.transform(InversePositioning, new Vector4f(0,
+		Vector4f cameraPosition = Matrix4f.transform(inversePositioning, new Vector4f(0,
 				0, 0, 1), null);
 		
-		System.out.println("Transformation matrix:\n" + InversePositioning.toString());
+		// System.out.println("Transformation matrix:\n" + InversePositioning.toString());
 		
 		// Set the position of the camera
 		currentPosition.x = cameraPosition.x;
 		currentPosition.y = cameraPosition.y;
 		currentPosition.z = cameraPosition.z;
-		
-		System.out.println("New position: " + currentPosition.toString());
-		
+		/*
+		System.out.println("Position: " + currentPosition.toString());
+		System.out.println("Target: " + targetPoint.toString());
+		*/
 		// Update the rotation
 		calculateCameraRotations();
 		
@@ -227,7 +229,12 @@ public abstract class Camera {
 		// Update YAW in RHS X, Z 2D coord system
 		yaw = -horizontalAngle;
 		pitch = -verticalAngle;
-		
+		/*
+		System.out.println("Zoom: " + zoomLevel);
+		System.out.println("Pitch: " + pitch);
+		System.out.println("Yaw: " + yaw);
+		System.out.println("Roll: " + roll);
+		*/
 	}
 	
 	/**
@@ -311,7 +318,7 @@ public abstract class Camera {
 		}
 		
 		// Changing this must update the position
-		calculateRelativePositionToTarget();
+		// calculateRelativePositionToTarget();
 	}
 	
 	/**
@@ -329,31 +336,33 @@ public abstract class Camera {
 	 * @param dy
 	 * @param dz
 	 */
-	protected final void updatePosition( float dx, float dy, float dz )
+	protected final void updateTargetPosition( float dx, float dy, float dz )
 	{
-		currentPosition.x += dx;
-		currentPosition.y += dy;
-		currentPosition.z += dz;
+		targetPoint.x += dx;
+		targetPoint.y += dy;
+		targetPoint.z += dz;
+		
+		calculateRelativePositionToTarget();		
 		
 		/* DEBUG */
-		System.out.println("New position: " + currentPosition.toString());
-		
-		// Create new viewmatrix
-		updateViewMatrix();
-		
-		// Apply the angles
-		//pitch = verticalAngle;
-		//yaw = horizontalAngle;
-		
-		// Reset the horizontal and vertical angles
-		//horizontalAngle = 0;
-		//verticalAngle = 0;
-		
-		// Calculate targetPoint
-		calculateTargetPoint();
+		//System.out.println("New position: " + currentPosition.toString());
 		
 		// Calculate rotations
-		calculateCameraRotations();
+		// calculateCameraRotations();
+		
+		// Create new viewmatrix
+		//updateViewMatrix();
+		
+		// Apply the angles
+		// pitch = verticalAngle;
+		// yaw = horizontalAngle;
+		
+		// Reset the horizontal and vertical angles
+		// horizontalAngle = 0;
+		// verticalAngle = 0;
+		
+		// Calculate targetPoint
+		// calculateTargetPoint();
 	}
 	
 	/**
@@ -365,6 +374,9 @@ public abstract class Camera {
 	{
 		// Update the yaw
 		horizontalAngle += dx;
+		
+		System.out.println("Horizontal angle: " + horizontalAngle);
+		
 		// Update the camera position
 		calculateRelativePositionToTarget();
 	}
@@ -378,6 +390,12 @@ public abstract class Camera {
 	{
 		// Update the pitch
 		verticalAngle += dx;
+		
+		// Clamp the vertical angle between 0 and 90
+		verticalAngle = Math.max(-90, Math.min(verticalAngle, 90));
+		
+		System.out.println("Vertical angle: " + verticalAngle);
+		
 		// Update the camera position
 		calculateRelativePositionToTarget();
 	}
@@ -398,23 +416,33 @@ public abstract class Camera {
 	 */
 	public final void moveForward( float dx )
 	{
-		// Fetch the x axis from the viewmatrix
-		Vector3f xAxis = new Vector3f(viewMatrix.m00, viewMatrix.m01, viewMatrix.m02);
+		/*
+		 * // Fetch the x axis from the viewmatrix
+		 * Vector3f xAxis = new Vector3f(viewMatrix.m00, viewMatrix.m01, viewMatrix.m02);
+		 * // Normalize the axis
+		 * xAxis.normalise();
+		 * // Fetch the Y axis from the viewmatrix
+		 * Vector3f yAxis = new Vector3f(viewMatrix.m10, viewMatrix.m11, viewMatrix.m12);
+		 * // Normalize the axis
+		 * yAxis.normalise();
+		 * // Cross both vectors to fetch the vector really pointing forward
+		 * Vector3f crossed = Vector3f.cross(xAxis, yAxis, null);
+		 */
+		
+		// Get Z axis
+		Vector3f zAxis = new Vector3f(viewMatrix.m02, viewMatrix.m12, viewMatrix.m22);
 		// Normalize the axis
-		xAxis.normalise();
+		zAxis.normalise();
 		
-		// Fetch the Y axis from the viewmatrix
-		Vector3f yAxis = new Vector3f(viewMatrix.m10, viewMatrix.m11, viewMatrix.m12);
-		// Normalize the axis
-		yAxis.normalise();
+		System.out.println("CAMERA Z AXIS: " + zAxis);
+		System.out.println("Viewmatrix:");
+		System.out.println(viewMatrix.toString());
 		
-		// Cross both vectors to fetch the vector really pointing forward
-		Vector3f crossed = Vector3f.cross(xAxis, yAxis, null);
-		
-		// Multiply the axis with the deficit
-		crossed.scale(-dx);
+		// Multiply the axis with the deficit, the Z axis points behind the cam so negate
+		// the value
+		zAxis.scale(-dx);
 		// Add this vector to the current position
-		updatePosition(crossed.x, crossed.y, crossed.z);
+		updateTargetPosition(zAxis.x, zAxis.y, zAxis.z);
 		
 		// Reset horizonatal and vertical angles
 		// horizontalAngle = 0;
@@ -440,24 +468,30 @@ public abstract class Camera {
 	 */
 	public void moveRight( float dy )
 	{
-		// Get the Y axis from the viewmatrix
-		Vector3f yAxis = new Vector3f(viewMatrix.m10, viewMatrix.m11, viewMatrix.m12);
+		/*
+		 * // Get the Y axis from the viewmatrix
+		 * Vector3f yAxis = new Vector3f(viewMatrix.m10, viewMatrix.m11, viewMatrix.m12);
+		 * // Normalize the axis
+		 * yAxis.normalise();
+		 * // Get the Z axis fromt the viewmatrix
+		 * Vector3f zAxis = new Vector3f(viewMatrix.m20, viewMatrix.m21, viewMatrix.m22);
+		 * // Normalize the axis
+		 * zAxis.normalise();
+		 * // Cross both vectors to get the vector really pointing right
+		 * Vector3f crossed = Vector3f.cross(zAxis, yAxis, null);
+		 */
+		Vector3f xAxis = new Vector3f(viewMatrix.m00, viewMatrix.m10, viewMatrix.m20);
 		// Normalize the axis
-		yAxis.normalise();
+		xAxis.normalise();
 		
-		// Get the Z axis fromt the viewmatrix
-		Vector3f zAxis = new Vector3f(viewMatrix.m20, viewMatrix.m21, viewMatrix.m22);
-		// Normalize the axis
-		zAxis.normalise();
-		
-		// Cross both vectors to get the vector really pointing right
-		Vector3f crossed = Vector3f.cross(zAxis, yAxis, null);
+		System.out.println("CAMERA X AXIS: " + xAxis);
+		System.out.println(viewMatrix.toString());
 		
 		// Multiply with deficit
-		crossed.scale(-dy);
+		xAxis.scale(dy);
 		
 		// Add it to the current position
-		updatePosition(crossed.x, crossed.y, crossed.z);
+		updateTargetPosition(xAxis.x, xAxis.y, xAxis.z);
 		
 		// Reset horizonatal and vertical angles
 		// horizontalAngle = 0;
