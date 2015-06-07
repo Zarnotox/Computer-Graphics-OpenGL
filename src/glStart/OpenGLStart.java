@@ -206,7 +206,7 @@ public class OpenGLStart {
 		long windowHandle = windowHelper.getHandle();
 		
 		// The handler for window resizing
-		resizeCallback = new ResizeHandler(res);
+		resizeCallback = new ResizeHandler(res, windowHelper);
 		
 		// The handler for key events
 		keyCallback = new KeyHandler(res);
