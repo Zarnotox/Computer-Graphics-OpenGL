@@ -33,6 +33,7 @@ import render.Render;
 import shader.StaticShader;
 import terrain.Terrain;
 import callbacks.CharHandler;
+import callbacks.EntityActionCallback;
 import callbacks.KeyHandler;
 import callbacks.MouseButtonCallback;
 import callbacks.ResizeHandler;
@@ -218,7 +219,7 @@ public class OpenGLStart {
 	/**
 	 * Initialise inputhandlers
 	 */
-	private void initCallbackHandlers(int windowWidth, int windowHeight)
+	private void initCallbackHandlers( int windowWidth, int windowHeight )
 	{
 		// WindowHandle
 		long windowHandle = windowHelper.getHandle();
@@ -290,6 +291,18 @@ public class OpenGLStart {
 				0, 0, 0, 1);
 		// Add the entity to the entity list
 		entityList.add(dragonEntity1);
+		// Add callback
+		dragonEntity1.setCallback(new EntityActionCallback() {
+			
+			@Override
+			public void doAction( Entity thisEntity )
+			{
+				//System.out.println("Dragon entity 1");
+				
+				thisEntity.increaseRotation(0, 5, 0);
+				
+			}
+		});
 		
 		// Generate an entity from the model and texture
 		Entity dragonEntity2 = new Entity(dragonTexturedModel, new Vector3f(10, 0, -15),
@@ -297,11 +310,42 @@ public class OpenGLStart {
 		// Add the entity to the entity list
 		entityList.add(dragonEntity2);
 		
+		dragonEntity2.setCallback(new EntityActionCallback() {
+			
+			@Override
+			public void doAction( Entity thisEntity )
+			{
+				//System.out.println("Dragon entity 2");
+				
+				thisEntity.increaseRotation(0, -5, 0);
+				
+			}
+		});
+		
+		// Generate an entity from the model and texture
+		Entity dragonEntity3 = new Entity(dragonTexturedModel, new Vector3f(-5, 0, -25),
+				0, 0, 30, 1);
+		// Add the entity to the entity list
+		entityList.add(dragonEntity3);
+		
+		dragonEntity3.setCallback(new EntityActionCallback() {
+			
+			@Override
+			public void doAction( Entity thisEntity )
+			{
+				//System.out.println("Dragon entity 3");
+				
+				thisEntity.increaseRotation(0, 0, 5);
+				
+			}
+		});
+		
 		/* Rectangle model */
 		// Create the model
 		Model boxModel = OBJLoader.loadObjModel("res/rectangle.obj", loader);
 		// Load the texture
-		//ModelTexture boxTexture = new ModelTexture(loader.loadTexture("res/trans_test.png")); // trans_test.png
+		// ModelTexture boxTexture = new
+		// ModelTexture(loader.loadTexture("res/trans_test.png")); // trans_test.png
 		ModelTexture boxTexture = new ModelTexture(PickingEngine.getPickingTextureID());
 		boxTexture.setHasTransparency(true);
 		boxTexture.setUseFakeLighting(true);
@@ -309,8 +353,17 @@ public class OpenGLStart {
 		TexturedModel texturedModel = new TexturedModel(boxModel, boxTexture);
 		// Generate an entity from the model and texture
 		Entity boxEntity = new Entity(texturedModel, new Vector3f(0, 5, 0), 0, 0, 0, 2);
-		
 		entityList.add(boxEntity);
+		boxEntity.setCallback(new EntityActionCallback() {
+			
+			@Override
+			public void doAction( Entity thisEntity )
+			{
+				//System.out.println("BOX clicked");
+				
+				thisEntity.increaseRotation(0, 5f, 0);
+			}
+		});
 		
 		/* TERRAINS */
 		// Load grass terrain texture
@@ -344,9 +397,9 @@ public class OpenGLStart {
 			entityBuffer.clear();
 			
 			// Update entity
-			 dragonEntity1.increaseRotation(0, 1, 0);
-			 dragonEntity2.increaseRotation(0, -1, 0);
-			//boxEntity.increaseRotation(0, 1, 0);
+			// dragonEntity1.increaseRotation(0, 1, 0);
+			// dragonEntity2.increaseRotation(0, -1, 0);
+			// boxEntity.increaseRotation(0, 1, 0);
 			
 			// Load all entities into the scene
 			for (Entity e : entityList)

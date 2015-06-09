@@ -108,7 +108,11 @@ public class EntityRenderer {
 	public void renderForPicking( Map<TexturedModel, List<Entity>> entities )
 	{
 		// The object counter
-		float i = 0;
+		float i = 1;
+		
+		// Preload object index 0
+		this.pickShader.loadObjectIndex(0);
+		
 		// Loop the map
 		for (TexturedModel model : entities.keySet())
 		{

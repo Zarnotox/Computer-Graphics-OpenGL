@@ -232,7 +232,7 @@ public class PickingEngine {
 		// Invert Y because origin is bottom left		
 		viewPortY = HEIGHT - viewPortY;
 		
-		System.out.println("Picking pixel: " + viewPortX + ":" + viewPortY);
+		//System.out.println("Picking pixel: " + viewPortX + ":" + viewPortY);
 		
 		/*
 		 * Generate floatbuffer, We get back the following items
@@ -267,6 +267,9 @@ public class PickingEngine {
 		return pickingTextureID;
 	}
 	
+	/**
+	 * Dump whole colour texture
+	 */
 	private static void debugTexture()
 	{
 		/*

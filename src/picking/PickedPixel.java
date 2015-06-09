@@ -14,18 +14,18 @@ public class PickedPixel {
 	/**
 	 * The n-th entity drawn on the scene
 	 */
-	private float objectID;
+	private int objectID;
 	
 	/**
 	 * The n-th vertex of the n-th object
 	 */
-	private float drawID;
+	private int drawID;
 	
 	
 	/**
 	 * The n-th primitive of the n-th vertex
 	 */
-	private float primID;
+	private int primID;
 	
 	/**
 	 * Constructor
@@ -34,17 +34,17 @@ public class PickedPixel {
 	 */
 	public PickedPixel( FloatBuffer pixelBuffer )
 	{
-		objectID = pixelBuffer.get(0);
-		drawID = pixelBuffer.get(1);
-		primID = pixelBuffer.get(2);
+		objectID = (int)pixelBuffer.get(0);		
+		drawID = (int)pixelBuffer.get(1);
+		primID = (int)pixelBuffer.get(2);
 		
-		System.out.println(Float.toString(objectID) + ":" + Float.toString(drawID) + ":" + Float.toString(primID));
+		//System.out.println(Float.toString(objectID) + ":" + Float.toString(drawID) + ":" + Float.toString(primID));
 	}
 	
 	/**
 	 * @return the objectID
 	 */
-	public float getObjectID()
+	public int getObjectID()
 	{
 		return this.objectID;
 	}
@@ -52,7 +52,7 @@ public class PickedPixel {
 	/**
 	 * @return the drawID
 	 */
-	public float getDrawID()
+	public int getDrawID()
 	{
 		return this.drawID;
 	}
@@ -60,7 +60,7 @@ public class PickedPixel {
 	/**
 	 * @return the primID
 	 */
-	public float getPrimID()
+	public int getPrimID()
 	{
 		return this.primID;
 	}
