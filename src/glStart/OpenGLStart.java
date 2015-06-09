@@ -12,6 +12,7 @@ import java.awt.Dimension;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import loader.Loader;
 import loader.OBJLoader;
@@ -27,6 +28,7 @@ import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 
+import picking.PickingEngine;
 import render.Render;
 import shader.StaticShader;
 import terrain.Terrain;
@@ -52,6 +54,11 @@ public class OpenGLStart {
 	 * Window handle
 	 */
 	private DisplayHelper windowHelper;
+	
+	/**
+	 * The picker engine
+	 */
+	private PickingEngine pickEngine;
 	
 	/**
 	 * Errorhandler
@@ -114,7 +121,7 @@ public class OpenGLStart {
 		}
 		
 		// Set window specs
-		int windowWidth = 700;
+		int windowWidth = 1200;
 		int windowHeight = 700;
 		// The window title
 		String windowTitle = "OpenGL project";
@@ -148,7 +155,7 @@ public class OpenGLStart {
 		int centerHeight = (GLFWvidmode.height(videoMode) - windowHeight) / 2;
 		// Center the created window
 		glfwSetWindowPos(windowHandle, centerWidth, centerHeight);
-				
+		
 		// Create the OpenGL context
 		glfwMakeContextCurrent(windowHandle);
 		// Enable v-sync
@@ -173,24 +180,27 @@ public class OpenGLStart {
 		// Create a new Loader
 		this.loader = new Loader();
 		
-		/* SHADERS */
-		// Create static shader
-		// StaticShader stShader = new StaticShader(loader);
-		// Load additional shaders
-		loadShaders();
-		
 		// Generate render resources
 		res = new RenderResources();
 		
+		Dimension winDim = windowHelper.getWindowDimensions();
+		int windowWidth = (int) winDim.getWidth();
+		int windowHeight = (int) winDim.getHeight();
+		
+		// The picker engine
+		pickEngine = new PickingEngine(windowWidth, windowHeight);
+		// Save the pickengine into the resource system
+		res.setPickEngine(pickEngine);
+		
 		/* CAMERAS */
-		//res.addCamera(new MovableCamera(new Vector3f(0, -10, -15), -90, 0, 0));
+		// res.addCamera(new MovableCamera(new Vector3f(0, -10, -15), -90, 0, 0));
 		res.setActiveCamera(new MovableCamera(new Vector3f(0, 5, 5), 0, 0, 0));
 		
 		/* LIGHTS */
 		res.addLight(new Light(new Vector3f(3000, 2000, 2000), new Vector3f(1, 1, 1)));
 		
 		// Generate Keyhandlers
-		initCallbackHandlers();
+		initCallbackHandlers(windowWidth, windowHeight);
 		
 		// Run the loop
 		loop();
@@ -208,13 +218,13 @@ public class OpenGLStart {
 	/**
 	 * Initialise inputhandlers
 	 */
-	private void initCallbackHandlers()
+	private void initCallbackHandlers(int windowWidth, int windowHeight)
 	{
 		// WindowHandle
 		long windowHandle = windowHelper.getHandle();
 		
 		// The handler for window resizing
-		resizeCallback = new ResizeHandler(res, windowHelper);
+		resizeCallback = new ResizeHandler(res, windowWidth, windowHeight);
 		
 		// The handler for key events
 		keyCallback = new KeyHandler(res);
@@ -241,16 +251,9 @@ public class OpenGLStart {
 	{
 		// Stop using the callback handlers
 		keyCallback.release();
-		
 		charCallback.release();
-	}
-	
-	/**
-	 * Compile and load shaders
-	 */
-	private void loadShaders()
-	{
-		
+		mouseButtonCallback.release();
+		resizeCallback.release();
 	}
 	
 	/**
@@ -263,12 +266,6 @@ public class OpenGLStart {
 		// Create a new Renderer
 		// EntityRenderer renderer = new EntityRenderer(windowHelper, res.getStShader());
 		Render renderer = new Render(windowHelper, loader, res);
-		
-		/* Create mouse picker */
-		RayCaster picker = new RayCaster(renderer.getProjectionMatrix(), windowHelper);
-		// Add it to the resources
-		res.setPicker(picker);
-		
 		
 		// Generate an entitylist to render
 		List<Entity> entityList = new ArrayList<>();
@@ -300,18 +297,18 @@ public class OpenGLStart {
 		// Add the entity to the entity list
 		entityList.add(dragonEntity2);
 		
-		/* Rectangle model */		
+		/* Rectangle model */
 		// Create the model
 		Model boxModel = OBJLoader.loadObjModel("res/rectangle.obj", loader);
 		// Load the texture
-		ModelTexture boxTexture = new ModelTexture(
-				loader.loadTexture("res/trans_test.png")); // trans_test.png
+		//ModelTexture boxTexture = new ModelTexture(loader.loadTexture("res/trans_test.png")); // trans_test.png
+		ModelTexture boxTexture = new ModelTexture(PickingEngine.getPickingTextureID());
 		boxTexture.setHasTransparency(true);
 		boxTexture.setUseFakeLighting(true);
 		// Link model and texture
 		TexturedModel texturedModel = new TexturedModel(boxModel, boxTexture);
 		// Generate an entity from the model and texture
-		Entity boxEntity = new Entity(texturedModel, new Vector3f(0, 5, 0), 0, 0, 0, 1);
+		Entity boxEntity = new Entity(texturedModel, new Vector3f(0, 5, 0), 0, 0, 0, 2);
 		
 		entityList.add(boxEntity);
 		
@@ -332,23 +329,29 @@ public class OpenGLStart {
 		terrainList.add(terrain4);
 		
 		// Set sky colour
-		res.setSkyColour(new Vector3f(0.4f, 0.1f, 0.2f));
+		Vector3f sky = new Vector3f(0.4f, 0.1f, 0.2f);
+		res.setSkyColour(sky);
+		System.out.println("Sky colour:" + sky.toString());
 		
 		// Fetch window handle
 		long windowHandle = windowHelper.getHandle();
 		// Loop till the user wants to close the window
 		while (glfwWindowShouldClose(windowHandle) == GL_FALSE)
 		{
+			// Fetch the active entity buffer
+			Map<TexturedModel, List<Entity>> entityBuffer = res.getActiveEntityBuffer();
+			// Clear the buffer
+			entityBuffer.clear();
 			
 			// Update entity
-			dragonEntity1.increaseRotation(0, 1, 0);
-			dragonEntity2.increaseRotation(0, -1, 0);
-			boxEntity.increaseRotation(0, 1, 0);
+			 dragonEntity1.increaseRotation(0, 1, 0);
+			 dragonEntity2.increaseRotation(0, -1, 0);
+			//boxEntity.increaseRotation(0, 1, 0);
 			
 			// Load all entities into the scene
 			for (Entity e : entityList)
 			{
-				renderer.processEntity(e);
+				renderer.processEntity(e, entityBuffer);
 			}
 			
 			// Load all terrains into the scene
@@ -358,7 +361,10 @@ public class OpenGLStart {
 			}
 			
 			// Render the entity
-			renderer.render();
+			renderer.render(entityBuffer);
+			
+			// Swap the entitybuffer
+			res.swapEntityBuffer();
 			
 			// Swap the buffer / show the rendered stuff
 			glfwSwapBuffers(windowHandle);

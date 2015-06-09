@@ -16,7 +16,7 @@ in float visibility;
 
 
 // output the color of the pixel
-out vec4 out_colour;
+layout(location = 0) out vec4 out_colour;
 
 // The object that contains a lineair sampling algorithm
 uniform sampler2D textureSampler;

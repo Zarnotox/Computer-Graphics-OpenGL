@@ -1,0 +1,16 @@
+#version 400 core
+
+// output the color of the pixel
+layout(location = 0) out vec4 out_Data;
+
+uniform float gObjectIndex;
+//uniform float gDrawIndex;
+
+void main(void) {
+
+	// Write Pixel ingormation into the picking texture
+    //FragColor = vec3(gObjectIndex, gDrawIndex, (gl_PrimitiveID + 1));
+
+	// Add the skycolour to the final pixel colour
+	out_Data = vec4(gObjectIndex, 0, (gl_PrimitiveID + 1), 1.0);
+}

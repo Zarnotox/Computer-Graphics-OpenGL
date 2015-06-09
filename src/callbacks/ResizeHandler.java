@@ -37,13 +37,12 @@ public class ResizeHandler extends GLFWWindowSizeCallback {
 	/**
 	 * 
 	 */
-	public ResizeHandler(RenderResources res, DisplayHelper windowHelper)
+	public ResizeHandler(RenderResources res, int width, int height)
 	{
 		this.res = res;
 		
-		Dimension dim = windowHelper.getWindowDimensions();
-		previousHeight = (int) dim.getHeight();
-		previousWidth = (int) dim.getWidth();
+		previousHeight = height;
+		previousWidth = width;
 		
 	}
 	
@@ -53,6 +52,8 @@ public class ResizeHandler extends GLFWWindowSizeCallback {
 	@Override
 	public void invoke( long window, int width, int height )
 	{
+		System.out.println("Window sizeCallback executed");
+		
 		// Check how much we have to move forward/backward
 		int dWidth = previousWidth - width;
 		int dHeight = previousHeight - height;
@@ -63,11 +64,13 @@ public class ResizeHandler extends GLFWWindowSizeCallback {
 		
 		// TODO loop camera's and increase viewangle
 		for(Camera cam: this.res.getCameraList()) {
-			cam.moveForward((dWidth+dHeight)/100f);
+			cam.moveForward((dWidth)/100f);
 		}
 		
 		// Update the OpenGL viewport
-		GL11.glViewport(0, 0, width, height);		
+		GL11.glViewport(0, 0, width, height);
+		// Update the pickengine textures
+		res.getPickEngine().regenerateTextures(width, height);
 	}
 	
 }

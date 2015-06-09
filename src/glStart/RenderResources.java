@@ -3,25 +3,33 @@
  */
 package glStart;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import picking.PickingEngine;
 import camera.Camera;
-import math.RayCaster;
 import math.vector.Vector3f;
 import shader.ShaderProgram;
+import entity.Entity;
 import entity.light.Light;
+import entity.model.TexturedModel;
 
 /**
  * @author Bert
  */
 public class RenderResources {
 	
-	/* PICKER */
-	private RayCaster picker;
+	// Entity buffers
+	private Deque< Map<TexturedModel, List<Entity>> > entityBuffers;
 	
-	/* SHADERS */
+	// Pick engine
+	private PickingEngine pickEngine;
 	
+	/* SHADERS */	
 	/**
 	 * The static shader
 	 */
@@ -31,6 +39,7 @@ public class RenderResources {
 	 * The list of generated shaders
 	 */
 	private List<ShaderProgram> shaderList;
+	
 	
 	/* CAMERAS */
 	
@@ -59,16 +68,42 @@ public class RenderResources {
 	 * Constructor
 	 */
 	public RenderResources( )
-	{
-		
-		//this.stShader = shader;
-		
+	{		
 		// Standard sky colour
 		skyColour = new Vector3f(0, 0, 0);
 		
 		// Generate lists
 		cameraList = new ArrayList<>();
 		lightList = new ArrayList<>();
+		
+		// Generate entity buffers
+		entityBuffers = new ArrayDeque<>();
+		entityBuffers.add(new HashMap<TexturedModel, List<Entity>>());
+		entityBuffers.add(new HashMap<TexturedModel, List<Entity>>());
+	}
+	
+	/**
+	 * Returns the current buffer used for entity storage
+	 * @return
+	 */
+	public Map<TexturedModel, List<Entity>> getActiveEntityBuffer() {
+		return entityBuffers.peek();
+	}
+	
+	/**
+	 * Swap the entityBuffer
+	 */
+	public void swapEntityBuffer() {
+		// Remove the head of the queue and add it to the tail
+		entityBuffers.addLast(entityBuffers.pollFirst());
+	}
+	
+	/**
+	 * Retrieves the used entityBuffer before the last swap
+	 * @return
+	 */
+	public Map<TexturedModel, List<Entity>> getLastUsedEntityBuffer() {
+		return entityBuffers.peekLast();
 	}
 	
 	/**
@@ -223,21 +258,22 @@ public class RenderResources {
 	{
 		this.skyColour = skyColour;
 	}
-	
+
 	/**
-	 * Set the mouse picker
-	 * @param r
+	 * @return the pickEngine
 	 */
-	public void setPicker(RayCaster r) {
-		this.picker = r;
+	public PickingEngine getPickEngine()
+	{
+		return this.pickEngine;
+	}
+
+	/**
+	 * @param pickEngine the pickEngine to set
+	 */
+	public void setPickEngine( PickingEngine pickEngine )
+	{
+		this.pickEngine = pickEngine;
 	}
 	
-	/**
-	 * Get the mouse picker
-	 * @return
-	 */
-	public RayCaster getPicker() {
-		return this.picker;
-	}
 	
 }

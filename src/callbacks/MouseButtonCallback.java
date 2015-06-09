@@ -14,6 +14,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 
+import picking.PickingEngine;
 import camera.Camera;
 
 /**
@@ -50,12 +51,7 @@ public class MouseButtonCallback extends GLFWMouseButtonCallback {
 				
 				// Get the mouse position on the screen
 				getMousePosition(window, vectorBuffer);
-				// get the current camera
-				Camera cam = res.getActiveCamera();
-				// Calculate the 3D ray
-				Vector3f ray = res.getPicker().castRay(cam, vectorBuffer);
-				// Print the ray
-				System.out.println(ray.toString());
+				System.out.println(PickingEngine.readPixel((int)vectorBuffer.getX(), (int)vectorBuffer.getY()).getObjectID());
 			}
 			
 			break;
@@ -80,7 +76,7 @@ public class MouseButtonCallback extends GLFWMouseButtonCallback {
 		float yPos = (float)yPosBuffer.get(0);
 		
 		buffer.x = xPos;
-		buffer.y = -yPos;
+		buffer.y = yPos;
 		
 		return;
 	}

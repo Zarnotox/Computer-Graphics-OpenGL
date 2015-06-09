@@ -171,10 +171,11 @@ public abstract class ShaderProgram {
 		List<String> lines = new ArrayList<>();
 		
 		String line;
-		while((line = reader.readLine()) != null) {
+		while ((line = reader.readLine()) != null)
+		{
 			lines.add(line);
 		}
-			
+		
 		// Concat everything
 		String collectedLines = String.join("\n", lines);
 		
@@ -256,6 +257,17 @@ public abstract class ShaderProgram {
 		 * The buffer itself
 		 */
 		GL20.glUniformMatrix4fv(location, false, MAT4FBuffer);
+	}
+	
+	/**
+	 * Load an integer into a uniform value
+	 * 
+	 * @param location
+	 * @param value
+	 */
+	protected void loadInteger( int location, int value )
+	{
+		GL20.glUniform1i(location, value);
 	}
 	
 }
