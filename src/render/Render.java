@@ -16,6 +16,8 @@ import java.util.Map;
 import javax.annotation.Generated;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL32;
+import org.lwjgl.opengl.GL33;
 
 import camera.Camera;
 import entity.Entity;
@@ -123,6 +125,12 @@ public class Render {
 	 * Flag indicating that there has to be drawn in wireframe mode
 	 */
 	private static boolean wireframeEnabled;
+	
+	/**
+	 * Flag indicating that flatShadeMode is activated.
+	 * OR flatshade or smoothshade can be active at the same time
+	 */
+	private static boolean flatShadeModeEnabled;
 	
 	/**
 	 * Constructor
@@ -247,6 +255,20 @@ public class Render {
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
 		wireframeEnabled = false;
+	}
+	
+	/**
+	 * Enable flat shading mode
+	 */
+	public static void enableFlatShading() {
+		flatShadeModeEnabled = true;
+	}
+	
+	/**
+	 * Disable flat shading mode
+	 */
+	public static void enableSmoothShading() {
+		flatShadeModeEnabled = false;
 	}
 	
 	/**

@@ -31,6 +31,11 @@ public class KeyHandler extends GLFWKeyCallback {
 	private boolean wireframeModeEnabled;
 	
 	/**
+	 * The flag for wireframe rendering
+	 */
+	private boolean flatModeEnabled;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param res
@@ -39,6 +44,7 @@ public class KeyHandler extends GLFWKeyCallback {
 	{
 		this.res = res;
 		wireframeModeEnabled = false;
+		flatModeEnabled = false;
 	}
 	
 	/*
@@ -140,6 +146,21 @@ public class KeyHandler extends GLFWKeyCallback {
 				}
 				
 				break;
+			case GLFW.GLFW_KEY_F5:
+				// Switch flag
+				flatModeEnabled = !flatModeEnabled;
+				
+				// Toggle wireframe mode
+				if ( flatModeEnabled == true )
+				{
+					Render.enableFlatShading();
+				}
+				else
+				{
+					Render.enableSmoothShading();
+				}
+				
+				break;			
 			}
 		}
 	}
