@@ -3,6 +3,7 @@
  */
 package entity;
 
+import callbacks.EntityActionCallback;
 import entity.model.TexturedModel;
 import math.vector.Vector3f;
 
@@ -11,17 +12,40 @@ import math.vector.Vector3f;
  */
 public class Entity {
 	
+	/**
+	 * The model, including texture
+	 */
 	private TexturedModel model;
 	
+	/**
+	 * The position of this entity
+	 */
 	private Vector3f position;
 	
+	/**
+	 * The rotation over the X-Axis
+	 */
 	private float rotationX;
 	
+	/**
+	 * The rotation over the Y-Axis
+	 */
 	private float rotationY;
 	
+	/**
+	 * The rotation over the Z-Axis
+	 */
 	private float rotationZ;
 	
+	/**
+	 * The scale of this entity
+	 */
 	private float scale;
+	
+	/**
+	 * The callback that handles actions on this entity
+	 */
+	private EntityActionCallback callback;
 	
 	/**
 	 * @param model
@@ -59,7 +83,6 @@ public class Entity {
 	}
 	
 	/**
-	 * 
 	 * @param dx
 	 * @param dy
 	 * @param dz
@@ -165,6 +188,31 @@ public class Entity {
 	public void setScale( float scale )
 	{
 		this.scale = scale;
+	}
+	
+	/**
+	 * Sets the callback on this entity.
+	 * The callback contains the actions when this entity is triggered.
+	 * The callback will overwrite the already present callback
+	 * 
+	 * @param callback
+	 */
+	public void setCallback( EntityActionCallback callback )
+	{
+		this.callback = callback;
+	}
+	
+	/**
+	 * Triggers the operations defined in the EntityCallBack function set into this
+	 * entity.
+	 * Only executes the callback once, if set.
+	 */
+	public void doAction()
+	{
+		if ( this.callback != null )
+		{
+			this.callback.doAction(this);
+		}
 	}
 	
 }

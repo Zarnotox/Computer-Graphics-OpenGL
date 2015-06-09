@@ -14,6 +14,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+import picking.shader.PickingShader;
 import shader.StaticShader;
 import entity.Entity;
 import entity.model.TexturedModel;
@@ -41,20 +42,31 @@ public class EntityRenderer {
 	private StaticShader stShader;
 	
 	/**
+	 * The picking shader program
+	 */
+	private PickingShader pickShader;
+	
+	/**
 	 * 
 	 */
 	public EntityRenderer( DisplayHelper displayHelper,
-			StaticShader shader,
+			StaticShader stShader,
+			PickingShader pickShader,
 			Matrix4f projMatrix )
 	{
 		this.displayHelper = displayHelper;
-		this.stShader = shader;
+		this.stShader = stShader;
+		this.pickShader = pickShader;
 		this.projectionMatrix = projMatrix;
 		
 		// Load the projectionMatrix straight into the shader
-		shader.start();
-		shader.loadProjectionMatrix(projectionMatrix);
-		shader.stop();
+		stShader.start();
+		stShader.loadProjectionMatrix(projectionMatrix);
+		stShader.stop();
+		
+		pickShader.start();
+		pickShader.loadProjectionMatrix(projectionMatrix);
+		pickShader.stop();
 	}
 	
 	/**
@@ -90,6 +102,47 @@ public class EntityRenderer {
 			
 			// Unbind the model
 			unbindTexturedModel();
+		}
+	}
+	
+	public void renderForPicking( Map<TexturedModel, List<Entity>> entities )
+	{
+		// The object counter
+		float i = 1;
+		
+		// Preload object index 0
+		this.pickShader.loadObjectIndex(0);
+		
+		// Loop the map
+		for (TexturedModel model : entities.keySet())
+		{
+			// Prepare the model
+			prepareTexturedModel(model, false);
+			
+			// Fetch all related entities
+			List<Entity> ent = entities.get(model);
+			// Loop all these entities
+			for (Entity entity : ent)
+			{
+				// Load the object counter, and increase it afterwards
+				this.pickShader.loadObjectIndex(i++);
+				
+				// Prepare the entity
+				preparePickingInstance(entity);
+				// Render the entity
+				/*
+				 * Draw the model to the scene
+				 * Draw Triangles
+				 * Draw amount of vertices
+				 * We are referring to the indices, so look for Unsigned Ints
+				 * 0 offset
+				 */
+				GL11.glDrawElements(GL11.GL_TRIANGLES, model.getVertexCount(),
+						GL11.GL_UNSIGNED_INT, 0);
+			}
+			
+			// Unbind the model
+						unbindTexturedModel();
 		}
 	}
 	
@@ -153,7 +206,7 @@ public class EntityRenderer {
 	}
 	
 	/**
-	 * Load entity specific data to the shader
+	 * Load entity specific data to the static shader
 	 * 
 	 * @param entity
 	 */
@@ -166,5 +219,21 @@ public class EntityRenderer {
 				entity.getRotationZ(), entity.getScale());
 		// Load that matrix into the shader
 		stShader.loadTransformationMatrix(transformationMatrix);
+	}
+	
+	/**
+	 * Load entity specific data to the picker shader
+	 * 
+	 * @param entity
+	 */
+	private void preparePickingInstance( Entity entity )
+	{
+		/* POSITION MANIPULATION */
+		// Create transformation matrix for the object
+		Matrix4f transformationMatrix = Maths.createTransformationMatrix(
+				entity.getPosition(), entity.getRotationX(), entity.getRotationY(),
+				entity.getRotationZ(), entity.getScale());
+		// Load that matrix into the shader
+		pickShader.loadTransformationMatrix(transformationMatrix);
 	}
 }

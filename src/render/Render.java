@@ -9,16 +9,15 @@ import static org.lwjgl.opengl.GL11.glClear;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Generated;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.GL33;
 
+import picking.PickingEngine;
+import picking.shader.PickingShader;
 import camera.Camera;
 import entity.Entity;
 import entity.light.Light;
@@ -105,6 +104,11 @@ public class Render {
 	private StaticShader entityShader;
 	
 	/**
+	 * The shader used for picking
+	 */
+	private PickingShader pickingShader;
+	
+	/**
 	 * The shader for the terrain
 	 */
 	private TerrainShader terrainShader;
@@ -114,7 +118,7 @@ public class Render {
 	/**
 	 * List of entities grouped by model
 	 */
-	private Map<TexturedModel, List<Entity>> entityMap;
+	// private Map<TexturedModel, List<Entity>> entityMap;
 	
 	/**
 	 * List of terrain entities
@@ -142,17 +146,20 @@ public class Render {
 		
 		// Assign values
 		this.displayHelper = displayHelper;
-		this.entityMap = new HashMap<>();
+		// this.entityMap = new HashMap<>();
 		this.terrainList = new ArrayList<>();
 		
 		// Generate the projetion matrix
 		createProjectionMatrix();
 		
-		// Generate a new static shader
+		// Generate a new static shaderprogram
 		this.entityShader = new StaticShader(loader);
+		// Generate a new picking shaderprogram
+		this.pickingShader = new PickingShader(loader);
+		
 		// Generate a new renderer
 		this.entityRenderer = new EntityRenderer(displayHelper, this.entityShader,
-				projectionMatrix);
+				this.pickingShader, projectionMatrix);
 		
 		// Generate a new terrain shader
 		this.terrainShader = new TerrainShader(loader);
@@ -160,6 +167,7 @@ public class Render {
 		this.terrainRenderer = new TerrainRenderer(displayHelper, this.terrainShader,
 				projectionMatrix);
 		
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		// Don't draw backwards facing primitives
 		enableCulling();
 	}
@@ -170,31 +178,81 @@ public class Render {
 	 * @param light
 	 * @param cam
 	 */
-	public void render()
+	public void render( Map<TexturedModel, List<Entity>> mapBuffer )
 	{
-		// Prepare the renderer
-		prepare();
-		
 		/* PROPERTIES */
 		Camera cam = resources.getActiveCamera();
 		Light sun = resources.getLightList().get(0);
 		Vector3f skyColour = resources.getSkyColour();
 		
+		/* Picking phase */
+		pickingPhase(cam, skyColour, sun, mapBuffer);
+		
+		/* Render phase */
+		renderPhase(cam, sun, skyColour, mapBuffer);
+		
+	}
+	
+	private void pickingPhase( Camera cam,
+			Vector3f skyColour,
+			Light sun,
+			Map<TexturedModel, List<Entity>> mapBuffer )
+	{
+		// Enable the picking texture
+		PickingEngine.enableWriting();
+		// Clear the color and depth buffers
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+		
+		pickingShader.start();
+		// Load the camera
+		pickingShader.loadviewMatrix(cam);
+		// Render
+		entityRenderer.renderForPicking(mapBuffer);
+		// Stop the shader program
+		pickingShader.stop();
+		
+		
+		// Disable the picking texture
+		PickingEngine.disableWriting();
+		
+	}
+	
+	private void renderPhase( Camera cam,
+			Light sun,
+			Vector3f skyColour,
+			Map<TexturedModel, List<Entity>> mapBuffer )
+	{
+		// Prepare the scene
+		// Use the depth buffer to properly render triangles
+		
+		// Clear the color and depth buffers
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+		// Fetch the sky colour
+		Vector3f sky = resources.getSkyColour();
+		// Set the base values of the color buffers
+		GL11.glClearColor(sky.x, sky.y, sky.z, 1);
+		// System.out.println("Sky colour:" + sky.toString());		
+		
 		/* ENTITIES */
+		
 		// Start shader programs
 		entityShader.start();
 		// Load sky
-		entityShader.loadSkyColour(skyColour);
+		//entityShader.loadSkyColour(skyColour);
 		// Load lights into the shader
 		entityShader.loadLight(sun);
 		// Load the camera
 		entityShader.loadviewMatrix(cam);
 		// Render
-		entityRenderer.render(entityMap, wireframeEnabled);
+		entityRenderer.render(mapBuffer, wireframeEnabled);
 		// Stop the shader program
 		entityShader.stop();
 		
+		
 		/* TERRAIN */
+		
 		// Do the same as the entity render cycle
 		terrainShader.start();
 		terrainShader.loadSkyColour(skyColour);
@@ -203,8 +261,8 @@ public class Render {
 		terrainRenderer.render(terrainList);
 		terrainShader.stop();
 		
+		
 		// Clear the entity collections
-		this.entityMap.clear();
 		this.terrainList.clear();
 	}
 	
@@ -285,27 +343,29 @@ public class Render {
 		// Fetch the sky colour
 		Vector3f sky = resources.getSkyColour();
 		// Set the base values of the color buffers
-		GL11.glClearColor(sky.x, sky.y, sky.z, 1);
+		// GL11.glClearColor(sky.x, sky.y, sky.z, 1);
+		// System.out.println("Sky colour:" + sky.toString());
 	}
 	
 	/**
-	 * Add an entity to the renderlist
+	 * Process an entity into Buffer map
 	 * 
 	 * @param entity
+	 * @param mapBuffer Maps entities to their model
 	 */
-	public void processEntity( Entity entity )
+	public void processEntity( Entity entity, Map<TexturedModel, List<Entity>> mapBuffer )
 	{
 		// Get the model from the entity
 		TexturedModel model = entity.getModel();
 		// Get the list of the entities matched to this model
-		List<Entity> entList = entityMap.get(model);
+		List<Entity> entList = mapBuffer.get(model);
 		// Check if there was a list
 		if ( entList == null )
 		{
 			// Generate a new list
 			List<Entity> newList = new ArrayList<>();
 			// Add it to the map
-			entityMap.put(model, newList);
+			mapBuffer.put(model, newList);
 			// Declare the list again
 			entList = newList;
 		}
@@ -333,8 +393,8 @@ public class Render {
 		Dimension d = displayHelper.getWindowDimensions();
 		
 		/* DEBUG */
-		//System.out.println("Calculating projection matrix");
-		//System.out.println("WindowDimensions: " + d.toString());
+		// System.out.println("Calculating projection matrix");
+		// System.out.println("WindowDimensions: " + d.toString());
 		
 		// Prepare matrix variables
 		float aspectRatio = (float) d.getWidth() / (float) d.getHeight();
@@ -362,13 +422,16 @@ public class Render {
 	{
 		entityShader.cleanUp();
 		terrainShader.cleanUp();
+		pickingShader.cleanUp();
 	}
 	
 	/**
 	 * Returns the projectionMatrix
+	 * 
 	 * @return
 	 */
-	public Matrix4f getProjectionMatrix() {
+	public Matrix4f getProjectionMatrix()
+	{
 		return projectionMatrix;
 	}
 	
