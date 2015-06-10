@@ -195,10 +195,12 @@ public class OpenGLStart {
 		
 		/* CAMERAS */
 		// res.addCamera(new MovableCamera(new Vector3f(0, -10, -15), -90, 0, 0));
-		res.setActiveCamera(new MovableCamera(new Vector3f(0, 5, 5), 0, 0, 0));
+		res.setActiveCamera(new MovableCamera(new Vector3f(0, 25, 10), 45, 0, 0));
 		
 		/* LIGHTS */
-		res.addLight(new Light(new Vector3f(3000, 2000, 2000), new Vector3f(1, 1, 1)));
+		res.addLight(new Light(new Vector3f(10, 1, -5), new Vector3f(0, 0, 1), new Vector3f(1, 0.02f, 0.002f)));
+		res.addLight(new Light(new Vector3f(-10, 1, -5), new Vector3f(1, 0, 0), new Vector3f(1, 0.02f, 0.002f)));
+		
 		
 		// Generate Keyhandlers
 		initCallbackHandlers(windowWidth, windowHeight);

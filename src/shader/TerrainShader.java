@@ -3,6 +3,8 @@
  */
 package shader;
 
+import java.util.List;
+
 import camera.Camera;
 import render.Render;
 import entity.light.Light;
@@ -13,9 +15,13 @@ import math.vector.Vector3f;
 
 /**
  * @author Bert
- *
  */
 public class TerrainShader extends ShaderProgram {
+	
+	/**
+	 * Maximum number of allowed lights
+	 */
+	private static final int MAX_LIGHTS = 2;
 	
 	/**
 	 * Location of the vertex shader file
@@ -43,14 +49,19 @@ public class TerrainShader extends ShaderProgram {
 	private int location_viewMatrix;
 	
 	/**
-	 * The location of the shader variable lightPosition
+	 * The locations of the shader variable lightPosition[2]
 	 */
-	private int location_lightPosition;
+	private int location_lightPosition[];
 	
 	/**
-	 * The location of the shader variable lightColour
+	 * The locatiosn of the shader variable lightColour[2]
 	 */
-	private int location_lightColour;
+	private int location_lightColour[];
+	
+	/**
+	 * The locations of the shader variables attenuation[2]
+	 */
+	private int location_attenuation[];
 	
 	/**
 	 * The location of the shader variable shineDamper
@@ -102,12 +113,20 @@ public class TerrainShader extends ShaderProgram {
 		location_transformationMatrix = super.getUniformVarLocation("transformationMatrix");
 		location_projectionMatrix = super.getUniformVarLocation("projectionMatrix");
 		location_viewMatrix = super.getUniformVarLocation("viewMatrix");
-		location_lightColour = super.getUniformVarLocation("lightColour");
-		location_lightPosition = super.getUniformVarLocation("lightPosition");
 		location_shineDamper = super.getUniformVarLocation("shineDamper");
 		location_reflectivity = super.getUniformVarLocation("reflectivity");
 		
 		location_skyColour = super.getUniformVarLocation("skyColour");
+		
+		// initialise arrays of lightPosition and lightColour
+		location_lightPosition = new int[MAX_LIGHTS];
+		location_lightColour = new int[MAX_LIGHTS];
+		location_attenuation = new int[MAX_LIGHTS];
+		for(int i=0; i<MAX_LIGHTS; i++){
+			location_lightPosition[i] = super.getUniformVarLocation("lightPosition[" + i +"]");
+			location_lightColour[i] = super.getUniformVarLocation("lightColour[" + i +"]");
+			location_attenuation[i] = super.getUniformVarLocation("attenuation[" + i + "]");
+		}
 	}
 	
 	/**
@@ -148,12 +167,24 @@ public class TerrainShader extends ShaderProgram {
 	 * 
 	 * @param light
 	 */
-	public void loadLight( Light light )
+	public void loadLights( List<Light> lights )
 	{
-		// Load the position of the light
-		super.loadVector(location_lightPosition, light.getPosition());
-		// Load the colour of the light
-		super.loadVector(location_lightColour, light.getColor());
+		for(int i=0; i<MAX_LIGHTS; i++){
+			if(i<lights.size()){
+				// load light position in
+				super.loadVector(location_lightPosition[i], lights.get(i).getPosition());
+				// load light colour in
+				super.loadVector(location_lightColour[i], lights.get(i).getColor());
+				// load light attenuation in
+				super.loadVector(location_attenuation[i], lights.get(i).getAttenuation());
+			}
+			else{ // if there are less lights than available light posions
+				// load 'empty' lights in
+				super.loadVector(location_lightPosition[i], new Vector3f(0,0,0));
+				super.loadVector(location_lightColour[i], new Vector3f(0,0,0));
+				super.loadVector(location_attenuation[i], new Vector3f(1,0,0));
+			}
+		}
 	}
 	
 	/**

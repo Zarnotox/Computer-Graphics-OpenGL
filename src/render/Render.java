@@ -219,20 +219,20 @@ public class Render {
 	{
 		/* PROPERTIES */
 		Camera cam = resources.getActiveCamera();
-		Light sun = resources.getLightList().get(0);
+		List<Light> lights = resources.getLightList();
 		Vector3f skyColour = resources.getSkyColour();
 		
 		/* Picking phase */
-		pickingPhase(cam, skyColour, sun, mapBuffer);
+		pickingPhase(cam, skyColour, lights, mapBuffer);
 		
 		/* Render phase */
-		renderPhase(cam, sun, skyColour, mapBuffer);
+		renderPhase(cam, lights, skyColour, mapBuffer);
 		
 	}
 	
 	private void pickingPhase( Camera cam,
 			Vector3f skyColour,
-			Light sun,
+			List<Light> lights,
 			Map<TexturedModel, List<Entity>> mapBuffer )
 	{
 		// Enable the picking texture
@@ -254,7 +254,7 @@ public class Render {
 	}
 	
 	private void renderPhase( Camera cam,
-			Light sun,
+			List<Light> lights,
 			Vector3f skyColour,
 			Map<TexturedModel, List<Entity>> mapBuffer )
 	{
@@ -274,12 +274,12 @@ public class Render {
 		if ( flatShadeModeEnabled != true )
 		{
 			// Render in normal mode
-			renderPhaseNormalMode(cam, sun, skyColour, mapBuffer);
+			renderPhaseNormalMode(cam, lights, skyColour, mapBuffer);
 		}
 		else
 		{
 			// Render in flat mode
-			renderPhaseFlatMode(cam, sun, skyColour, mapBuffer);
+			renderPhaseFlatMode(cam, lights, skyColour, mapBuffer);
 		}
 		
 		// Clear the entity collections
@@ -287,7 +287,7 @@ public class Render {
 	}
 	
 	private void renderPhaseNormalMode( Camera cam,
-			Light sun,
+			List<Light> lights,
 			Vector3f skyColour,
 			Map<TexturedModel, List<Entity>> mapBuffer )
 	{
@@ -296,7 +296,7 @@ public class Render {
 		// Load sky
 		entityShader.loadSkyColour(skyColour);
 		// Load lights into the shader
-		entityShader.loadLight(sun);
+		entityShader.loadLights(lights);
 		// Load the camera
 		entityShader.loadviewMatrix(cam);
 		// Render
@@ -309,14 +309,14 @@ public class Render {
 		// Do the same as the entity render cycle
 		terrainShader.start();
 		terrainShader.loadSkyColour(skyColour);
-		terrainShader.loadLight(sun);
+		terrainShader.loadLights(lights);
 		terrainShader.loadviewMatrix(cam);
 		terrainRenderer.render(terrainList, false);
 		terrainShader.stop();
 	}
 	
 	private void renderPhaseFlatMode( Camera cam,
-			Light sun,
+			List<Light> lights,
 			Vector3f skyColour,
 			Map<TexturedModel, List<Entity>> mapBuffer )
 	{
@@ -324,7 +324,7 @@ public class Render {
 		// Load sky
 		// entityShader.loadSkyColour(skyColour);
 		// Load lights into the shader
-		flatShader.loadLight(sun);
+		flatShader.loadLights(lights);
 		// Load the camera
 		flatShader.loadviewMatrix(cam);
 		// Render

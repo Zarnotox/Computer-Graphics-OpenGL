@@ -13,8 +13,8 @@ layout(location=2) in vec3 normal;
 out vec2 pass_textureCoords;
 // The normal of this vertex
 flat out vec3 surfaceNormal;
-// The vector from this vertex aiming to the light
-out vec3 toLightVector;
+// The vector from this vertex aiming to the light (2 lights)
+out vec3 toLightVector[2];
 // The vector towards the camera
 out vec3 toCameraVector;
 
@@ -23,7 +23,8 @@ out vec3 toCameraVector;
 uniform mat4 transformationMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
-uniform vec3 lightPosition;
+// 2 lights
+uniform vec3 lightPosition[2];
 
 void main(void) {
 	
@@ -42,8 +43,10 @@ void main(void) {
 	// Pass the transformed normal of this vertex to the fragment shader
 	surfaceNormal = (transformationMatrix * vec4(normal, 0.0)).xyz;
 	
-	// Pass the vector towards the light, 
-	toLightVector = lightPosition - worldPosition.xyz;
+	for(int i=0; i<2; i++){
+		// Pass the vector towards the light, 
+		toLightVector[i] = lightPosition[i] - worldPosition.xyz;
+	}
 	
 	// Calculate the vector towards the camera
 	toCameraVector = (inverse(viewMatrix) * vec4(0.0, 0.0, 0.0, 1.0)).xyz - worldPosition.xyz;
