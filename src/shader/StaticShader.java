@@ -150,8 +150,8 @@ public class StaticShader extends ShaderProgram {
 			location_attenuation[i] = super.getUniformVarLocation("attenuation[" + i + "]");
 		}
 		
-		location_numberOfTextureRows = super.getUniformVarLocation("numberOfTextureRows");
-		location_texOffset = super.getUniformVarLocation("texOffset");
+		//location_numberOfTextureRows = super.getUniformVarLocation("numberOfTextureRows");
+		//location_texOffset = super.getUniformVarLocation("texOffset");
 	}
 	
 	/**

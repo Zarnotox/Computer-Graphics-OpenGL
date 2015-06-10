@@ -1,5 +1,7 @@
 #version 400 core
 
+const int numOfLights = 2;
+
 // Variables from the VAO
 layout(location=0) in vec3 position;
 // Texture mapping from the vertex
@@ -11,8 +13,8 @@ layout(location=2) in vec3 normal;
 // VARIABLE NAMES MATTER!
 // The normal of this vertex
 flat out vec3 surfaceNormal;
-// The vector from this vertex aiming to the light (4 lights)
-out vec3 toLightVector[4];
+// The vector from this vertex aiming to the light
+out vec3 toLightVector[numOfLights];
 // The vector towards the camera
 out vec3 toCameraVector;
 
@@ -21,8 +23,7 @@ out vec3 toCameraVector;
 uniform mat4 transformationMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
-// 4 lights
-uniform vec3 lightPosition[4];
+uniform vec3 lightPosition[numOfLights];
 
 void main(void) {
 	
@@ -38,7 +39,7 @@ void main(void) {
 	// Pass the transformed normal of this vertex to the fragment shader
 	surfaceNormal = (transformationMatrix * vec4(normal, 0.0)).xyz;
 	
-	for(int i=0; i<2; i++){
+	for(int i=0; i<numOfLights; i++){
 		// Pass the vector towards the light, 
 		toLightVector[i] = lightPosition[i] - worldPosition.xyz;
 	}

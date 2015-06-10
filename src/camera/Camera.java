@@ -447,7 +447,7 @@ public abstract class Camera {
 		// the value
 		zAxis.scale(-dz);
 		// Add this vector to the current position
-		updateTargetPosition(zAxis.x, zAxis.y, zAxis.z);
+		updateTargetPosition(0*zAxis.x, 0*zAxis.y, zAxis.z);
 		
 		// Reset horizonatal and vertical angles
 		// horizontalAngle = 0;
@@ -496,7 +496,7 @@ public abstract class Camera {
 		xAxis.scale(dx);
 		
 		// Add it to the current position
-		updateTargetPosition(xAxis.x, xAxis.y, xAxis.z);
+		updateTargetPosition(xAxis.x, 0*xAxis.y, 0*xAxis.z);
 		
 		// Reset horizonatal and vertical angles
 		// horizontalAngle = 0;

@@ -58,6 +58,11 @@ public class FlatShader extends ShaderProgram {
 	private int location_lightColour[];
 	
 	/**
+	 * The locations of the shader variables attenuation[2]
+	 */
+	private int location_attenuation[];
+	
+	/**
 	 * Constructor
 	 */
 	public FlatShader( Loader loader )
@@ -94,12 +99,14 @@ public class FlatShader extends ShaderProgram {
 		location_viewMatrix = super.getUniformVarLocation("viewMatrix");
 		
 		// initialise arrays of lightPosition and lightColour
-				location_lightPosition = new int[MAX_LIGHTS];
-				location_lightColour = new int[MAX_LIGHTS];
-				for(int i=0; i<MAX_LIGHTS; i++){
-					location_lightPosition[i] = super.getUniformVarLocation("lightPosition[" + i +"]");
-					location_lightColour[i] = super.getUniformVarLocation("lightColour[" + i +"]");
-				}
+		location_lightPosition = new int[MAX_LIGHTS];
+		location_lightColour = new int[MAX_LIGHTS];
+		location_attenuation = new int[MAX_LIGHTS];
+		for(int i=0; i<MAX_LIGHTS; i++){
+			location_lightPosition[i] = super.getUniformVarLocation("lightPosition[" + i +"]");
+			location_lightColour[i] = super.getUniformVarLocation("lightColour[" + i +"]");
+			location_attenuation[i] = super.getUniformVarLocation("attenuation[" + i + "]");
+		}
 	}
 	
 	/**
@@ -148,13 +155,15 @@ public class FlatShader extends ShaderProgram {
 				super.load3DVector(location_lightPosition[i], lights.get(i).getPosition());
 				// load light colour in
 				super.load3DVector(location_lightColour[i], lights.get(i).getColor());
+				// load light attenuation in
+				super.load3DVector(location_attenuation[i], lights.get(i).getAttenuation());
 			}
 			else{ // if there are less lights than available light posions
 				// load 'empty' lights in
 				super.load3DVector(location_lightPosition[i], new Vector3f(0,0,0));
 				super.load3DVector(location_lightColour[i], new Vector3f(0,0,0));
+				super.load3DVector(location_attenuation[i], new Vector3f(1,0,0));
 			}
 		}
-
 	}	
 }

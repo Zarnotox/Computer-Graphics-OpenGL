@@ -3,6 +3,7 @@
 // Some fog values
 const float density = 0.008;
 const float gradient = 5;
+const int numOfLights = 2;
 
 // Variables from the VAO
 layout(location=0) in vec3 position;
@@ -17,8 +18,8 @@ layout(location=2) in vec3 normal;
 out vec2 pass_textureCoords;
 // The normal of this vertex
 out vec3 surfaceNormal;
-// The vector from this vertex aiming to the light (4 lights)
-out vec3 toLightVector[4];
+// The vector from this vertex aiming to the light
+out vec3 toLightVector[numOfLights];
 // The vector towards the camera
 out vec3 toCameraVector;
 // The visibility value of this vertex
@@ -29,8 +30,7 @@ out float visibility;
 uniform mat4 transformationMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
-// 4 lights
-uniform vec3 lightPosition[4];
+uniform vec3 lightPosition[numOfLights];
 uniform float useFakeLighting;
 
 uniform float numberOfTextureRows;
@@ -63,8 +63,8 @@ void main(void) {
 	// Pass the transformed normal of this vertex to the fragment shader
 	surfaceNormal = (transformationMatrix * vec4(actualNormal, 0.0)).xyz;
 	
-	// Pass the vector towards the light (2 lights)
-	for(int i=0; i<2; i++){
+	// Pass the vector towards the light
+	for(int i=0; i<numOfLights; i++){
 		toLightVector[i] = lightPosition[i] - worldPosition.xyz;
 	}
 	

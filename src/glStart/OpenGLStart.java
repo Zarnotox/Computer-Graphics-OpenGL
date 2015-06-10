@@ -196,11 +196,11 @@ public class OpenGLStart {
 		
 		/* CAMERAS */
 		// res.addCamera(new MovableCamera(new Vector3f(0, -10, -15), -90, 0, 0));
-		res.setActiveCamera(new MovableCamera(new Vector3f(0, 25, 10), 45, 0, 0));
+		res.setActiveCamera(new MovableCamera(new Vector3f(0, 5, 20), 0, 0, 0));
 		
 		/* LIGHTS */
-		res.addLight(new Light(new Vector3f(10, 1, -5), new Vector3f(0, 0, 1), new Vector3f(1, 0.02f, 0.002f)));
-		res.addLight(new Light(new Vector3f(-10, 1, -5), new Vector3f(1, 0, 0), new Vector3f(1, 0.02f, 0.002f)));
+		res.addLight(new Light(new Vector3f(0, 2, 0), new Vector3f(1f, 1f, 1f), new Vector3f(2, -0.06f, 0.001f)));
+		//res.addLight(new Light(new Vector3f(-15, 2, 0), new Vector3f(2, 0.5f, 0.5f), new Vector3f(1, 0.02f, 0.002f)));
 		
 		
 		// Generate Keyhandlers
@@ -384,12 +384,10 @@ public class OpenGLStart {
 		Terrain terrain4 = new Terrain(0, 0, loader, terrainTexture);
 		
 		// Add the terrain to the list
-		/*
 		terrainList.add(terrain);
 		terrainList.add(terrain2);
 		terrainList.add(terrain3);
 		terrainList.add(terrain4);
-		*/
 		
 		// Set sky colour
 		Vector3f sky = new Vector3f(0.4f, 0.1f, 0.2f);
