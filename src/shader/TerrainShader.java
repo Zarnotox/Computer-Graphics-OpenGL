@@ -172,17 +172,17 @@ public class TerrainShader extends ShaderProgram {
 		for(int i=0; i<MAX_LIGHTS; i++){
 			if(i<lights.size()){
 				// load light position in
-				super.loadVector(location_lightPosition[i], lights.get(i).getPosition());
+				super.load3DVector(location_lightPosition[i], lights.get(i).getPosition());
 				// load light colour in
-				super.loadVector(location_lightColour[i], lights.get(i).getColor());
+				super.load3DVector(location_lightColour[i], lights.get(i).getColor());
 				// load light attenuation in
-				super.loadVector(location_attenuation[i], lights.get(i).getAttenuation());
+				super.load3DVector(location_attenuation[i], lights.get(i).getAttenuation());
 			}
 			else{ // if there are less lights than available light posions
 				// load 'empty' lights in
-				super.loadVector(location_lightPosition[i], new Vector3f(0,0,0));
-				super.loadVector(location_lightColour[i], new Vector3f(0,0,0));
-				super.loadVector(location_attenuation[i], new Vector3f(1,0,0));
+				super.load3DVector(location_lightPosition[i], new Vector3f(0,0,0));
+				super.load3DVector(location_lightColour[i], new Vector3f(0,0,0));
+				super.load3DVector(location_attenuation[i], new Vector3f(1,0,0));
 			}
 		}
 	}
@@ -207,7 +207,7 @@ public class TerrainShader extends ShaderProgram {
 	 */
 	public void loadSkyColour(Vector3f sky) {
 		// Load the var
-		super.loadVector(location_skyColour, sky);
+		super.load3DVector(location_skyColour, sky);
 	}
 	
 }

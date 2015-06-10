@@ -145,15 +145,16 @@ public class FlatShader extends ShaderProgram {
 		for(int i=0; i<MAX_LIGHTS; i++){
 			if(i<lights.size()){
 				// load light position in
-				super.loadVector(location_lightPosition[i], lights.get(i).getPosition());
+				super.load3DVector(location_lightPosition[i], lights.get(i).getPosition());
 				// load light colour in
-				super.loadVector(location_lightColour[i], lights.get(i).getColor());
+				super.load3DVector(location_lightColour[i], lights.get(i).getColor());
 			}
 			else{ // if there are less lights than available light posions
 				// load 'empty' lights in
-				super.loadVector(location_lightPosition[i], new Vector3f(0,0,0));
-				super.loadVector(location_lightColour[i], new Vector3f(0,0,0));
+				super.load3DVector(location_lightPosition[i], new Vector3f(0,0,0));
+				super.load3DVector(location_lightColour[i], new Vector3f(0,0,0));
 			}
 		}
+
 	}	
 }

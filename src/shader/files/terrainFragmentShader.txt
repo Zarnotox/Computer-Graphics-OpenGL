@@ -5,8 +5,8 @@
 in vec2 pass_textureCoords;
 // The normal of this surface
 in vec3 surfaceNormal;
-// The vector towards the light (2 lights)
-in vec3 toLightVector[2];
+// The vector towards the light (4 lights)
+in vec3 toLightVector[4];
 // Vector towards the camera
 in vec3 toCameraVector;
 // Visibility factor
@@ -17,9 +17,9 @@ out vec4 out_colour;
 
 // The object that contains a lineair sampling algorithm
 uniform sampler2D textureSampler;
-// 2 lights
-uniform vec3 lightColour[2];
-uniform vec3 attenuation[2];
+// 4 lights
+uniform vec3 lightColour[4];
+uniform vec3 attenuation[4];
 uniform float shineDamper;
 uniform float reflectivity;
 uniform vec3 skyColour;

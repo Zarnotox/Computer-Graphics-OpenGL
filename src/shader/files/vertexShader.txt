@@ -17,8 +17,8 @@ layout(location=2) in vec3 normal;
 out vec2 pass_textureCoords;
 // The normal of this vertex
 out vec3 surfaceNormal;
-// The vector from this vertex aiming to the light (2 lights)
-out vec3 toLightVector[2];
+// The vector from this vertex aiming to the light (4 lights)
+out vec3 toLightVector[4];
 // The vector towards the camera
 out vec3 toCameraVector;
 // The visibility value of this vertex
@@ -29,9 +29,12 @@ out float visibility;
 uniform mat4 transformationMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
-// 2 lights
-uniform vec3 lightPosition[2];
+// 4 lights
+uniform vec3 lightPosition[4];
 uniform float useFakeLighting;
+
+uniform float numberOfTextureRows;
+uniform vec2 texOffset;
 
 void main(void) {
 	
@@ -45,7 +48,8 @@ void main(void) {
 	gl_Position = projectionMatrix * positionRelativeToCam;
 	
 	// Lineair assign vertex coords to texture coords
-	pass_textureCoords = textureCoords;
+	// The texture coords are gotten from the texture atlas
+	pass_textureCoords = (textureCoords / numberOfTextureRows) + texOffset;
 	
 	// Copy the normal of this vertex
 	vec3 actualNormal = normal;

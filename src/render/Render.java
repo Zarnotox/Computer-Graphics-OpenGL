@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL32;
@@ -418,13 +419,13 @@ public class Render {
 	public void prepare()
 	{
 		// Use the depth buffer to properly render triangles
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		//GL11.glEnable(GL11.GL_DEPTH_TEST);
 		
 		// Clear the color and depth buffers
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		// Fetch the sky colour
-		Vector3f sky = resources.getSkyColour();
+		//Vector3f sky = resources.getSkyColour();
 		// Set the base values of the color buffers
 		// GL11.glClearColor(sky.x, sky.y, sky.z, 1);
 		// System.out.println("Sky colour:" + sky.toString());
@@ -516,6 +517,10 @@ public class Render {
 	public Matrix4f getProjectionMatrix()
 	{
 		return projectionMatrix;
+	}
+	
+	private void calculateFPS() {
+		double currentTime = GLFW.glfwGetTime();
 	}
 	
 }

@@ -3,18 +3,16 @@
 // Variables from the VAO
 layout(location=0) in vec3 position;
 // Texture mapping from the vertex
-layout(location=1) in vec2 textureCoords;
+//layout(location=1) in vec2 textureCoords;
 // The normal of this vertex
 layout(location=2) in vec3 normal;
 
 // Output to fragment shader
 // VARIABLE NAMES MATTER!
-// Adjusted texture coordinates
-out vec2 pass_textureCoords;
 // The normal of this vertex
 flat out vec3 surfaceNormal;
-// The vector from this vertex aiming to the light (2 lights)
-out vec3 toLightVector[2];
+// The vector from this vertex aiming to the light (4 lights)
+out vec3 toLightVector[4];
 // The vector towards the camera
 out vec3 toCameraVector;
 
@@ -23,8 +21,8 @@ out vec3 toCameraVector;
 uniform mat4 transformationMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
-// 2 lights
-uniform vec3 lightPosition[2];
+// 4 lights
+uniform vec3 lightPosition[4];
 
 void main(void) {
 	
@@ -36,9 +34,6 @@ void main(void) {
 	
 	// Set position of vertex
 	gl_Position = projectionMatrix * positionRelativeToCam;
-	
-	// Lineair assign vertex coords to texture coords
-	pass_textureCoords = textureCoords;
 	
 	// Pass the transformed normal of this vertex to the fragment shader
 	surfaceNormal = (transformationMatrix * vec4(normal, 0.0)).xyz;

@@ -99,15 +99,18 @@ public class PickingEngine {
 		// Create the texture object for primitives
 		pickingTextureID = GL11.glGenTextures();
 		
-		FloatBuffer primBuffer = BufferUtils.createFloatBuffer(windowWidth*windowHeight*3);
+		FloatBuffer primBuffer = BufferUtils.createFloatBuffer(windowWidth * windowHeight
+				* 3);
 		
 		// Bind the primitives texture
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, pickingTextureID);
 		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL30.GL_RGB32F, windowWidth,
 				windowHeight, 0, GL11.GL_RGB, GL11.GL_FLOAT, primBuffer);
 		
-		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER,
+				GL11.GL_NEAREST);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER,
+				GL11.GL_NEAREST);
 		
 		// Make this buffer the output of the fragment shaders
 		GL30.glFramebufferTexture2D(GL30.GL_DRAW_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0,
@@ -123,15 +126,18 @@ public class PickingEngine {
 		// Create the texture object for depth buffer
 		depthTextureID = GL11.glGenTextures();
 		
-		FloatBuffer depthBuffer = BufferUtils.createFloatBuffer(windowWidth * windowHeight * 3);
+		FloatBuffer depthBuffer = BufferUtils.createFloatBuffer(windowWidth
+				* windowHeight * 3);
 		
 		// Bind the depth texture
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, depthTextureID);
 		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_DEPTH_COMPONENT, windowWidth,
-				windowHeight, 0, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT, depthBuffer);		
+				windowHeight, 0, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT, depthBuffer);
 		
-		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER,
+				GL11.GL_LINEAR);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER,
+				GL11.GL_LINEAR);
 		
 		GL30.glFramebufferTexture2D(GL30.GL_DRAW_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT,
 				GL11.GL_TEXTURE_2D, depthTextureID, 0);
@@ -186,8 +192,13 @@ public class PickingEngine {
 	 */
 	public boolean cleanup()
 	{
+		// delete all existing textures
+		GL11.glDeleteTextures(pickingTextureID);
+		GL11.glDeleteTextures(depthTextureID);
 		
-		return false;
+		GL30.glDeleteFramebuffers(fboID);
+		
+		return true;
 	}
 	
 	/**
@@ -228,11 +239,10 @@ public class PickingEngine {
 		// Read from the color buffer
 		GL11.glReadBuffer(GL30.GL_COLOR_ATTACHMENT0);
 		
-		
-		// Invert Y because origin is bottom left		
+		// Invert Y because origin is bottom left
 		viewPortY = HEIGHT - viewPortY;
 		
-		//System.out.println("Picking pixel: " + viewPortX + ":" + viewPortY);
+		// System.out.println("Picking pixel: " + viewPortX + ":" + viewPortY);
 		
 		/*
 		 * Generate floatbuffer, We get back the following items
@@ -260,6 +270,7 @@ public class PickingEngine {
 	
 	/**
 	 * Return the texture used for colorpicking
+	 * 
 	 * @return
 	 */
 	public static int getPickingTextureID()

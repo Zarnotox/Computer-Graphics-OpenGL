@@ -4,11 +4,10 @@ const vec4 flatShadeColour = vec4(0.7, 0.7, 0.7, 1.0);
 
 // input from the vertexShader
 // VARIABLE NAMES MATTER!
-in vec2 pass_textureCoords;
 // The normal of this surface
 flat in vec3 surfaceNormal;
-// The vector towards the light (2 lights)
-in vec3 toLightVector[2];
+// The vector towards the light (4 lights)
+in vec3 toLightVector[4];
 // Vector towards the camera
 in vec3 toCameraVector;
 
@@ -16,20 +15,12 @@ in vec3 toCameraVector;
 layout(location = 0) out vec4 out_colour;
 
 // The object that contains a lineair sampling algorithm
-// 2 lights
-uniform vec3 lightColour[2];
+// 4 lights
+uniform vec3 lightColour[4];
 uniform float wireframe;
 uniform vec3 skyColour;
 
 void main(void) {
-
-	// Check for wireframe mode
-	if(wireframe > 0.5) {
-		// Overwrite the output colour
-		out_colour = flatShadeColour;
-		return;
-	}
-
 	// Normalize vectors first
 	vec3 unitNormal = normalize(surfaceNormal);
 	vec3 unitVectorToCamera = normalize(toCameraVector);
