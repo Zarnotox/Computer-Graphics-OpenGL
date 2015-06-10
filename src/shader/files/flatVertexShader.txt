@@ -1,9 +1,5 @@
 #version 400 core
 
-// Some fog values
-const float density = 0.008;
-const float gradient = 5;
-
 // Variables from the VAO
 layout(location=0) in vec3 position;
 // Texture mapping from the vertex
@@ -16,13 +12,11 @@ layout(location=2) in vec3 normal;
 // Adjusted texture coordinates
 out vec2 pass_textureCoords;
 // The normal of this vertex
-out vec3 surfaceNormal;
+flat out vec3 surfaceNormal;
 // The vector from this vertex aiming to the light
 out vec3 toLightVector;
 // The vector towards the camera
 out vec3 toCameraVector;
-// The visibility value of this vertex
-out float visibility;
 
 
 // The injected variables from the shader java file
@@ -30,7 +24,6 @@ uniform mat4 transformationMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform vec3 lightPosition;
-uniform float useFakeLighting;
 
 void main(void) {
 	
@@ -46,17 +39,8 @@ void main(void) {
 	// Lineair assign vertex coords to texture coords
 	pass_textureCoords = textureCoords;
 	
-	// Copy the normal of this vertex
-	vec3 actualNormal = normal;
-	
-	// Manipulate the normal if we want more light on this vertex
-	if(useFakeLighting > 0.5) {
-		// A vector in the up direction
-		actualNormal = vec3(0.0, 1.0, 0.0);
-	}
-	
 	// Pass the transformed normal of this vertex to the fragment shader
-	surfaceNormal = (transformationMatrix * vec4(actualNormal, 0.0)).xyz;
+	surfaceNormal = (transformationMatrix * vec4(normal, 0.0)).xyz;
 	
 	// Pass the vector towards the light, 
 	toLightVector = lightPosition - worldPosition.xyz;
@@ -67,8 +51,4 @@ void main(void) {
 	// Distance to the camera from this vertex
 	float distance = length(positionRelativeToCam.xyz);
 	
-	// Calculate visibility factor
-	visibility = exp(-pow((distance*density), gradient));
-	// Keep the value inbetween 0 and 1
-	visibility = clamp(visibility, 0.0, 1.0);
 }

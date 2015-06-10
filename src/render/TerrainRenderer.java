@@ -16,6 +16,7 @@ import glStart.DisplayHelper;
 import math.Maths;
 import math.matrix.Matrix4f;
 import math.vector.Vector3f;
+import shader.FlatShader;
 import shader.TerrainShader;
 import terrain.Terrain;
 
@@ -35,6 +36,11 @@ public class TerrainRenderer {
 	private TerrainShader shader;
 	
 	/**
+	 * The shader for flat shading
+	 */
+	private FlatShader flatShader;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param shader
@@ -42,26 +48,31 @@ public class TerrainRenderer {
 	 */
 	public TerrainRenderer( DisplayHelper displayHelper,
 			TerrainShader shader,
+			FlatShader flatShader,
 			Matrix4f projectionMatrix )
 	{
 		this.displayHelper = displayHelper;
 		this.shader = shader;
-		
-		// Load the projectionMatrix into the shader
-		shader.start();
-		shader.loadProjectionMatrix(projectionMatrix);
-		shader.stop();
+		this.flatShader = flatShader;
 	}
 	
-	public void render( List<Terrain> terrains )
+	public void render( List<Terrain> terrains, boolean flat )
 	{
 		// Loop each terrain from the list
 		for (Terrain terrain : terrains)
 		{
 			// Prepare the model/texture
 			prepareTerrainModel(terrain);
+			
 			// Load entity specific data
-			prepareTerrainEntity(terrain);
+			if ( flat != true )
+			{
+				prepareNormalTerrainEntity(terrain);
+			}
+			else
+			{
+				prepareFlatTerrainEntity(terrain);
+			}
 			// Render the terrain
 			GL11.glDrawElements(GL11.GL_TRIANGLES, terrain.getModel().getVertexCount(),
 					GL11.GL_UNSIGNED_INT, 0);
@@ -123,7 +134,7 @@ public class TerrainRenderer {
 	 * 
 	 * @param entity
 	 */
-	private void prepareTerrainEntity( Terrain entity )
+	private void prepareNormalTerrainEntity( Terrain entity )
 	{
 		/* POSITION MANIPULATION */
 		// Create transformation matrix for the object
@@ -131,6 +142,21 @@ public class TerrainRenderer {
 				entity.getX(), 0, entity.getZ()), 0, 0, 0, 1);
 		// Load that matrix into the shader
 		shader.loadTransformationMatrix(transformationMatrix);
+	}
+	
+	/**
+	 * Load entity specific data to the shader
+	 * 
+	 * @param entity
+	 */
+	private void prepareFlatTerrainEntity( Terrain entity )
+	{
+		/* POSITION MANIPULATION */
+		// Create transformation matrix for the object
+		Matrix4f transformationMatrix = Maths.createTransformationMatrix(new Vector3f(
+				entity.getX(), 0, entity.getZ()), 0, 0, 0, 1);
+		// Load that matrix into the shader
+		flatShader.loadTransformationMatrix(transformationMatrix);
 	}
 	
 }

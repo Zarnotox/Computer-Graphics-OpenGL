@@ -15,6 +15,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import picking.shader.PickingShader;
+import shader.FlatShader;
 import shader.StaticShader;
 import entity.Entity;
 import entity.model.TexturedModel;
@@ -34,12 +35,17 @@ public class EntityRenderer {
 	/**
 	 * Matrix that transforms our view of the scene
 	 */
-	private Matrix4f projectionMatrix;
+	// private Matrix4f projectionMatrix;
 	
 	/**
 	 * The static shader instance
 	 */
 	private StaticShader stShader;
+	
+	/**
+	 * The shader for flat shading
+	 */
+	private FlatShader flatShader;
 	
 	/**
 	 * The picking shader program
@@ -52,21 +58,13 @@ public class EntityRenderer {
 	public EntityRenderer( DisplayHelper displayHelper,
 			StaticShader stShader,
 			PickingShader pickShader,
+			FlatShader flatShader,
 			Matrix4f projMatrix )
 	{
 		this.displayHelper = displayHelper;
 		this.stShader = stShader;
+		this.flatShader = flatShader;
 		this.pickShader = pickShader;
-		this.projectionMatrix = projMatrix;
-		
-		// Load the projectionMatrix straight into the shader
-		stShader.start();
-		stShader.loadProjectionMatrix(projectionMatrix);
-		stShader.stop();
-		
-		pickShader.start();
-		pickShader.loadProjectionMatrix(projectionMatrix);
-		pickShader.stop();
 	}
 	
 	/**
@@ -74,7 +72,9 @@ public class EntityRenderer {
 	 * 
 	 * @param entities
 	 */
-	public void render( Map<TexturedModel, List<Entity>> entities, boolean wireframe )
+	public void render( Map<TexturedModel, List<Entity>> entities,
+			boolean flat,
+			boolean wireframe )
 	{
 		// Loop the map
 		for (TexturedModel model : entities.keySet())
@@ -87,7 +87,14 @@ public class EntityRenderer {
 			for (Entity entity : ent)
 			{
 				// Prepare the entity
-				prepareInstance(entity);
+				if ( flat != true )
+				{
+					prepareNormalInstance(entity);
+				}
+				else
+				{
+					prepareFlatShadingInstance(entity);
+				}
 				// Render the entity
 				/*
 				 * Draw the model to the scene
@@ -142,7 +149,7 @@ public class EntityRenderer {
 			}
 			
 			// Unbind the model
-						unbindTexturedModel();
+			unbindTexturedModel();
 		}
 	}
 	
@@ -210,7 +217,7 @@ public class EntityRenderer {
 	 * 
 	 * @param entity
 	 */
-	private void prepareInstance( Entity entity )
+	private void prepareNormalInstance( Entity entity )
 	{
 		/* POSITION MANIPULATION */
 		// Create transformation matrix for the object
@@ -219,6 +226,22 @@ public class EntityRenderer {
 				entity.getRotationZ(), entity.getScale());
 		// Load that matrix into the shader
 		stShader.loadTransformationMatrix(transformationMatrix);
+	}
+	
+	/**
+	 * Load entity specific data to the static shader
+	 * 
+	 * @param entity
+	 */
+	private void prepareFlatShadingInstance( Entity entity )
+	{
+		/* POSITION MANIPULATION */
+		// Create transformation matrix for the object
+		Matrix4f transformationMatrix = Maths.createTransformationMatrix(
+				entity.getPosition(), entity.getRotationX(), entity.getRotationY(),
+				entity.getRotationZ(), entity.getScale());
+		// Load that matrix into the shader
+		flatShader.loadTransformationMatrix(transformationMatrix);
 	}
 	
 	/**

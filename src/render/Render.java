@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.GL33;
 
@@ -27,6 +28,7 @@ import glStart.RenderResources;
 import loader.Loader;
 import math.matrix.Matrix4f;
 import math.vector.Vector3f;
+import shader.FlatShader;
 import shader.StaticShader;
 import shader.TerrainShader;
 import terrain.Terrain;
@@ -104,6 +106,11 @@ public class Render {
 	private StaticShader entityShader;
 	
 	/**
+	 * The flat shader
+	 */
+	private FlatShader flatShader;
+	
+	/**
 	 * The shader used for picking
 	 */
 	private PickingShader pickingShader;
@@ -143,6 +150,7 @@ public class Render {
 	{
 		resources = res;
 		wireframeEnabled = false;
+		flatShadeModeEnabled = false;
 		
 		// Assign values
 		this.displayHelper = displayHelper;
@@ -154,22 +162,51 @@ public class Render {
 		
 		// Generate a new static shaderprogram
 		this.entityShader = new StaticShader(loader);
+		// Generate a new shader for flat shading
+		this.flatShader = new FlatShader(loader);
 		// Generate a new picking shaderprogram
 		this.pickingShader = new PickingShader(loader);
+		// Generate a new terrain shader
+		this.terrainShader = new TerrainShader(loader);
+		
+		initShaders();
 		
 		// Generate a new renderer
 		this.entityRenderer = new EntityRenderer(displayHelper, this.entityShader,
-				this.pickingShader, projectionMatrix);
+				this.pickingShader, this.flatShader, projectionMatrix);
 		
-		// Generate a new terrain shader
-		this.terrainShader = new TerrainShader(loader);
 		// Generate a new terrain renderer
 		this.terrainRenderer = new TerrainRenderer(displayHelper, this.terrainShader,
-				projectionMatrix);
+				this.flatShader, projectionMatrix);
 		
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		// Don't draw backwards facing primitives
 		enableCulling();
+	}
+	
+	/**
+	 * Setup some shader variables
+	 */
+	private void initShaders()
+	{
+		// Load the projectionMatrix straight into the shader
+		
+		this.entityShader.start();
+		this.entityShader.loadProjectionMatrix(projectionMatrix);
+		this.entityShader.stop();
+		
+		this.pickingShader.start();
+		this.pickingShader.loadProjectionMatrix(projectionMatrix);
+		this.pickingShader.stop();
+		
+		this.flatShader.start();
+		this.flatShader.loadProjectionMatrix(projectionMatrix);
+		this.flatShader.stop();
+		
+		this.terrainShader.start();
+		this.terrainShader.loadProjectionMatrix(projectionMatrix);
+		this.terrainShader.stop();
+		
 	}
 	
 	/**
@@ -203,7 +240,6 @@ public class Render {
 		// Clear the color and depth buffers
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		
 		pickingShader.start();
 		// Load the camera
 		pickingShader.loadviewMatrix(cam);
@@ -211,7 +247,6 @@ public class Render {
 		entityRenderer.renderForPicking(mapBuffer);
 		// Stop the shader program
 		pickingShader.stop();
-		
 		
 		// Disable the picking texture
 		PickingEngine.disableWriting();
@@ -233,23 +268,41 @@ public class Render {
 		Vector3f sky = resources.getSkyColour();
 		// Set the base values of the color buffers
 		GL11.glClearColor(sky.x, sky.y, sky.z, 1);
-		// System.out.println("Sky colour:" + sky.toString());		
+		// System.out.println("Sky colour:" + sky.toString());
 		
 		/* ENTITIES */
+		if ( flatShadeModeEnabled != true )
+		{
+			// Render in normal mode
+			renderPhaseNormalMode(cam, sun, skyColour, mapBuffer);
+		}
+		else
+		{
+			// Render in flat mode
+			renderPhaseFlatMode(cam, sun, skyColour, mapBuffer);
+		}
 		
+		// Clear the entity collections
+		this.terrainList.clear();
+	}
+	
+	private void renderPhaseNormalMode( Camera cam,
+			Light sun,
+			Vector3f skyColour,
+			Map<TexturedModel, List<Entity>> mapBuffer )
+	{
 		// Start shader programs
 		entityShader.start();
 		// Load sky
-		//entityShader.loadSkyColour(skyColour);
+		entityShader.loadSkyColour(skyColour);
 		// Load lights into the shader
 		entityShader.loadLight(sun);
 		// Load the camera
 		entityShader.loadviewMatrix(cam);
 		// Render
-		entityRenderer.render(mapBuffer, wireframeEnabled);
+		entityRenderer.render(mapBuffer, false, wireframeEnabled);
 		// Stop the shader program
 		entityShader.stop();
-		
 		
 		/* TERRAIN */
 		
@@ -258,12 +311,37 @@ public class Render {
 		terrainShader.loadSkyColour(skyColour);
 		terrainShader.loadLight(sun);
 		terrainShader.loadviewMatrix(cam);
-		terrainRenderer.render(terrainList);
+		terrainRenderer.render(terrainList, false);
 		terrainShader.stop();
+	}
+	
+	private void renderPhaseFlatMode( Camera cam,
+			Light sun,
+			Vector3f skyColour,
+			Map<TexturedModel, List<Entity>> mapBuffer )
+	{
+		flatShader.start();
+		// Load sky
+		// entityShader.loadSkyColour(skyColour);
+		// Load lights into the shader
+		flatShader.loadLight(sun);
+		// Load the camera
+		flatShader.loadviewMatrix(cam);
+		// Render
+		entityRenderer.render(mapBuffer, true, wireframeEnabled);
+		// Stop the shader program
 		
+		/* TERRAIN */
 		
-		// Clear the entity collections
-		this.terrainList.clear();
+		// Do the same as the entity render cycle
+		// terrainShader.start();
+		// terrainShader.loadSkyColour(skyColour);
+		// terrainShader.loadLight(sun);
+		// terrainShader.loadviewMatrix(cam);
+		terrainRenderer.render(terrainList, true);
+		// terrainShader.stop();
+		flatShader.stop();
+		
 	}
 	
 	/**
@@ -318,14 +396,19 @@ public class Render {
 	/**
 	 * Enable flat shading mode
 	 */
-	public static void enableFlatShading() {
+	public static void enableFlatShading()
+	{
 		flatShadeModeEnabled = true;
+		
+		GL32.glProvokingVertex(GL32.GL_FIRST_VERTEX_CONVENTION);
+		
 	}
 	
 	/**
 	 * Disable flat shading mode
 	 */
-	public static void enableSmoothShading() {
+	public static void enableSmoothShading()
+	{
 		flatShadeModeEnabled = false;
 	}
 	

@@ -1,0 +1,52 @@
+#version 400 core
+
+const vec4 flatShadeColour = vec4(0.7, 0.7, 0.7, 1.0);
+
+// input from the vertexShader
+// VARIABLE NAMES MATTER!
+in vec2 pass_textureCoords;
+// The normal of this surface
+flat in vec3 surfaceNormal;
+// The vector towards the light
+in vec3 toLightVector;
+// Vector towards the camera
+in vec3 toCameraVector;
+
+// output the color of the pixel
+layout(location = 0) out vec4 out_colour;
+
+// The object that contains a lineair sampling algorithm
+uniform vec3 lightColour;
+uniform float wireframe;
+uniform vec3 skyColour;
+
+void main(void) {
+
+	// Check for wireframe mode
+	if(wireframe > 0.5) {
+		// Overwrite the output colour
+		out_colour = flatShadeColour;
+		return;
+	}
+
+	// Normalize vectors first
+	vec3 unitNormal = normalize(surfaceNormal);
+	vec3 unitLightVector = normalize(toLightVector);
+	vec3 unitVectorToCamera = normalize(toCameraVector);
+	
+	// Calculate dotproduct of both vectors
+	float nDot1 = dot(unitNormal, unitLightVector);
+	// We want no black spots
+	float brightness = max(nDot1, 0.05);
+	// Calculate the light diffuse strength
+	vec3 diffuse = brightness * lightColour;
+	
+	// The direction from where the light comes
+	vec3 lightDirection = -unitLightVector;
+	// Calculate the reflected light vector with the vector from the lightsource
+	// and the normal
+	vec3 reflectedLightDirection = reflect(lightDirection, unitNormal);
+	
+	// Give back the pixel colour
+	out_colour = vec4(diffuse, 1.0) * flatShadeColour;
+}
