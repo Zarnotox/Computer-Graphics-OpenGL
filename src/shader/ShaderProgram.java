@@ -25,6 +25,11 @@ import org.lwjgl.opengl.GL20;
 public abstract class ShaderProgram {
 	
 	/**
+	 * The maximum amount of lights simultanously active in the shaders
+	 */
+	public final static int MAX_LIGHTS_IN_SHADERS = 4;
+	
+	/**
 	 * The reusable buffer to for shipping Matrix4f objects to OpenGL
 	 */
 	private static FloatBuffer MAT4FBuffer = BufferUtils.createFloatBuffer(Matrix4f.SIZE);

@@ -1,5 +1,7 @@
 #version 400 core
 
+const int amountOfLights = 4;
+
 // Some fog values
 const float density = 0.008;
 const float gradient = 5;
@@ -18,11 +20,13 @@ out vec2 pass_textureCoords;
 // The normal of this vertex
 out vec3 surfaceNormal;
 // The vector from this vertex aiming to the light (4 lights)
-out vec3 toLightVector[4];
+out vec3 toLightVector[amountOfLights];
 // The vector towards the camera
 out vec3 toCameraVector;
 // The visibility value of this vertex
 out float visibility;
+// The amount of lights
+out int pass_amountOfLights;
 
 
 // The injected variables from the shader java file
@@ -30,13 +34,14 @@ uniform mat4 transformationMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 // 4 lights
-uniform vec3 lightPosition[4];
+uniform vec3 lightPosition[amountOfLights];
 uniform float useFakeLighting;
 
 uniform float numberOfTextureRows;
 uniform vec2 texOffset;
 
 void main(void) {
+	
 	
 	// Calculate the transformed location of this vertec
 	vec4 worldPosition = transformationMatrix * vec4(position, 1.0);
@@ -64,7 +69,7 @@ void main(void) {
 	surfaceNormal = (transformationMatrix * vec4(actualNormal, 0.0)).xyz;
 	
 	// Pass the vector towards the light (2 lights)
-	for(int i=0; i<2; i++){
+	for(int i=0; i<amountOfLights; i++){
 		toLightVector[i] = lightPosition[i] - worldPosition.xyz;
 	}
 	

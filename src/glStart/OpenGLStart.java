@@ -16,7 +16,6 @@ import java.util.Map;
 
 import loader.Loader;
 import loader.OBJLoader;
-import math.RayCaster;
 import math.vector.Vector3f;
 
 import org.lwjgl.glfw.GLFW;
@@ -31,14 +30,13 @@ import org.lwjgl.opengl.GLContext;
 
 import picking.PickingEngine;
 import render.Render;
-import shader.StaticShader;
 import terrain.Terrain;
 import callbacks.CharHandler;
 import callbacks.EntityActionCallback;
 import callbacks.KeyHandler;
 import callbacks.MouseButtonCallback;
 import callbacks.ResizeHandler;
-import camera.MovableCamera;
+import camera.Camera;
 import entity.Entity;
 import entity.light.Light;
 import entity.model.Model;
@@ -196,11 +194,19 @@ public class OpenGLStart {
 		
 		/* CAMERAS */
 		// res.addCamera(new MovableCamera(new Vector3f(0, -10, -15), -90, 0, 0));
-		res.setActiveCamera(new MovableCamera(new Vector3f(0, 25, 10), 45, 0, 0));
+		Camera mainCam = new Camera(new Vector3f(0, 25, 10), 45, 0, 0);
+		res.setActiveCamera(mainCam);
 		
 		/* LIGHTS */
-		res.addLight(new Light(new Vector3f(10, 1, -5), new Vector3f(0, 0, 1), new Vector3f(1, 0.02f, 0.002f)));
-		res.addLight(new Light(new Vector3f(-10, 1, -5), new Vector3f(1, 0, 0), new Vector3f(1, 0.02f, 0.002f)));
+		res.addLight(new Light(new Vector3f(10, 1, -5), new Vector3f(0.3f, 0.3f, 0.7f), new Vector3f(1, 0.02f, 0.002f)));
+		res.addLight(new Light(new Vector3f(-10, 1, -5), new Vector3f(0.6f, 0.6f, 0.6f), new Vector3f(1, 0.02f, 0.002f)));
+		// Position will be set by the camera
+		Light camLight = new Light(null, new Vector3f(1f, 1f, 1f), new Vector3f(1, 0.08f, 0.002f));
+		res.addLight(camLight);
+		
+		// Attach the light to the camera
+		mainCam.attachLight(camLight);
+		
 		
 		
 		// Generate Keyhandlers
@@ -293,9 +299,10 @@ public class OpenGLStart {
 		dragonTexture.setReflectivity(1);
 		
 		// Generate an entity from the model and texture
-		Entity dragonEntity1 = new Entity(dragonTexturedModel, 1, new Vector3f(-10, 0, -15),
-				0, 0, 0, 1);
-		System.out.println("Texture coord: " + dragonEntity1.getTextureXOffset() + "-" + dragonEntity1.getTextureYOffset());
+		Entity dragonEntity1 = new Entity(dragonTexturedModel, 1, new Vector3f(-10, 0,
+				-15), 0, 0, 0, 1);
+		System.out.println("Texture coord: " + dragonEntity1.getTextureXOffset() + "-"
+				+ dragonEntity1.getTextureYOffset());
 		
 		// Add the entity to the entity list
 		entityList.add(dragonEntity1);
@@ -314,8 +321,8 @@ public class OpenGLStart {
 		});
 		
 		// Generate an entity from the model and texture
-		Entity dragonEntity2 = new Entity(dragonTexturedModel, 2, new Vector3f(10, 0, -15),
-				0, 0, 0, 1);
+		Entity dragonEntity2 = new Entity(dragonTexturedModel, 2,
+				new Vector3f(10, 0, -15), 0, 0, 0, 1);
 		// Add the entity to the entity list
 		entityList.add(dragonEntity2);
 		
@@ -332,8 +339,8 @@ public class OpenGLStart {
 		});
 		
 		// Generate an entity from the model and texture
-		Entity dragonEntity3 = new Entity(dragonTexturedModel, 3, new Vector3f(-5, 0, -25),
-				0, 0, 30, 1);
+		Entity dragonEntity3 = new Entity(dragonTexturedModel, 3,
+				new Vector3f(-5, 0, -25), 0, 0, 30, 1);
 		// Add the entity to the entity list
 		entityList.add(dragonEntity3);
 		
@@ -353,8 +360,10 @@ public class OpenGLStart {
 		// Create the model
 		Model boxModel = OBJLoader.loadObjModel("res/rectangle.obj", loader);
 		// Load the texture
-		ModelTexture boxTexture = new ModelTexture(loader.loadTexture("res/trans_test.png")); // trans_test.png
-		//ModelTexture boxTexture = new ModelTexture(PickingEngine.getPickingTextureID());
+		ModelTexture boxTexture = new ModelTexture(
+				loader.loadTexture("res/trans_test.png")); // trans_test.png
+		// ModelTexture boxTexture = new
+		// ModelTexture(PickingEngine.getPickingTextureID());
 		boxTexture.setHasTransparency(true);
 		boxTexture.setUseFakeLighting(true);
 		// Link model and texture
@@ -384,12 +393,10 @@ public class OpenGLStart {
 		Terrain terrain4 = new Terrain(0, 0, loader, terrainTexture);
 		
 		// Add the terrain to the list
-		/*
 		terrainList.add(terrain);
 		terrainList.add(terrain2);
 		terrainList.add(terrain3);
 		terrainList.add(terrain4);
-		*/
 		
 		// Set sky colour
 		Vector3f sky = new Vector3f(0.4f, 0.1f, 0.2f);

@@ -1,5 +1,7 @@
 #version 400 core
 
+const int amountOfLights = 4;
+
 const vec4 wireframeColour = vec4(0.7, 0.7, 0.7, 1.0);
 
 // input from the vertexShader
@@ -8,7 +10,7 @@ in vec2 pass_textureCoords;
 // The normal of this surface
 in vec3 surfaceNormal;
 // The vector towards the light (4 lights)
-in vec3 toLightVector[4];
+in vec3 toLightVector[amountOfLights];
 // Vector towards the camera
 in vec3 toCameraVector;
 // Visibility factor
@@ -20,8 +22,8 @@ layout(location = 0) out vec4 out_colour;
 // The object that contains a lineair sampling algorithm
 uniform sampler2D textureSampler;
 // 2 lights
-uniform vec3 lightColour[4];
-uniform vec3 attenuation[4];
+uniform vec3 lightColour[amountOfLights];
+uniform vec3 attenuation[amountOfLights];
 uniform float shineDamper;
 uniform float reflectivity;
 uniform float wireframe;
@@ -47,7 +49,7 @@ void main(void) {
 	vec3 totalSpecular = vec3(0.0);
 
 	// All light code needs to be runned #ofLights times
-	for(int i=0; i<2; i++){
+	for(int i=0; i<amountOfLights; i++){
 		// calculate attenuation factor
 		float distance = length(toLightVector[i]);
 		float attFactor = attenuation[i].x + (attenuation[i].y * distance) + (attenuation[i].z * distance * distance);

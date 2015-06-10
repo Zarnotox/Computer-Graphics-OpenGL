@@ -54,6 +54,10 @@ public class CharHandler extends GLFWCharCallback {
 			// Previous camera
 			res.previousCamera();
 			break;
+		case 'r':
+			// Reset the position of the active camera
+			res.getActiveCamera().reset();
+			break;
 		}
 		
 	}

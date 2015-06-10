@@ -48,8 +48,7 @@ public class TerrainRenderer {
 	 */
 	public TerrainRenderer( DisplayHelper displayHelper,
 			TerrainShader shader,
-			FlatShader flatShader,
-			Matrix4f projectionMatrix )
+			FlatShader flatShader)
 	{
 		this.displayHelper = displayHelper;
 		this.shader = shader;

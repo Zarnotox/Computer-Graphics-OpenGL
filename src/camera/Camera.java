@@ -3,6 +3,7 @@
  */
 package camera;
 
+import entity.light.Light;
 import math.Maths;
 import math.matrix.Matrix4f;
 import math.vector.Vector3f;
@@ -11,7 +12,7 @@ import math.vector.Vector4f;
 /**
  * @author Bert
  */
-public abstract class Camera {
+public class Camera {
 	
 	/**
 	 * The standard zoom level
@@ -76,6 +77,11 @@ public abstract class Camera {
 	private float horizontalAngle;
 	
 	/**
+	 * The light attached to this camera
+	 */
+	private Light attachedLight;
+	
+	/**
 	 * @param position
 	 * @param pitch Rotation (deg) around the X-axis
 	 * @param yaw Rotation (deg) around the Y-axis
@@ -83,6 +89,8 @@ public abstract class Camera {
 	 */
 	public Camera( Vector3f position, float pitch, float yaw, float roll )
 	{
+		this.attachedLight = null;
+		
 		this.currentPosition = position;
 		this.originalPosition = position;
 		
@@ -187,9 +195,14 @@ public abstract class Camera {
 		// System.out.println("Transformation matrix:\n" + InversePositioning.toString());
 		
 		// Set the position of the camera
-		currentPosition.x = cameraPosition.x;
-		currentPosition.y = cameraPosition.y;
-		currentPosition.z = cameraPosition.z;
+		Vector3f newPosition = new Vector3f(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+		currentPosition = newPosition;
+		
+		/* Set attached light position */
+		if(attachedLight != null) {
+			attachedLight.setPosition(newPosition);
+		}
+		
 		/*
 		System.out.println("Position: " + currentPosition.toString());
 		System.out.println("Target: " + targetPoint.toString());
@@ -404,15 +417,6 @@ public abstract class Camera {
 	}
 	
 	/**
-	 * Moves the camera in a certain position
-	 * 
-	 * @param dx
-	 * @param dy
-	 * @param dz
-	 */
-	public abstract void moveRelative( float dx, float dy, float dz );
-	
-	/**
 	 * Move along the camera's Z-axis
 	 * 
 	 * @param dz
@@ -522,6 +526,24 @@ public abstract class Camera {
 		
 		// Add it to the current position
 		updateTargetPosition(yAxis.x, yAxis.y, yAxis.z);
+	}
+	
+	/**
+	 * Attach a light to this camera, every camera update will also update the light.
+	 * The currently attached light will be discarded.
+	 * @param light
+	 */
+	public void attachLight(Light light) {
+		this.attachedLight = light;
+		
+		light.setPosition(currentPosition);
+	}
+	
+	/**
+	 * Detaches the light of the camera
+	 */
+	public void detachLight() {
+		this.attachedLight = null;
 	}
 	
 }

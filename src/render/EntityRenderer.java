@@ -58,8 +58,7 @@ public class EntityRenderer {
 	public EntityRenderer( DisplayHelper displayHelper,
 			StaticShader stShader,
 			PickingShader pickShader,
-			FlatShader flatShader,
-			Matrix4f projMatrix )
+			FlatShader flatShader)
 	{
 		this.displayHelper = displayHelper;
 		this.stShader = stShader;

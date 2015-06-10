@@ -19,11 +19,6 @@ import math.vector.Vector3f;
 public class TerrainShader extends ShaderProgram {
 	
 	/**
-	 * Maximum number of allowed lights
-	 */
-	private static final int MAX_LIGHTS = 2;
-	
-	/**
 	 * Location of the vertex shader file
 	 */
 	private static final String VERTEX_SHADER_FILE = "shader/files/terrainVertexShader.txt";
@@ -119,10 +114,10 @@ public class TerrainShader extends ShaderProgram {
 		location_skyColour = super.getUniformVarLocation("skyColour");
 		
 		// initialise arrays of lightPosition and lightColour
-		location_lightPosition = new int[MAX_LIGHTS];
-		location_lightColour = new int[MAX_LIGHTS];
-		location_attenuation = new int[MAX_LIGHTS];
-		for(int i=0; i<MAX_LIGHTS; i++){
+		location_lightPosition = new int[MAX_LIGHTS_IN_SHADERS];
+		location_lightColour = new int[MAX_LIGHTS_IN_SHADERS];
+		location_attenuation = new int[MAX_LIGHTS_IN_SHADERS];
+		for(int i=0; i<MAX_LIGHTS_IN_SHADERS; i++){
 			location_lightPosition[i] = super.getUniformVarLocation("lightPosition[" + i +"]");
 			location_lightColour[i] = super.getUniformVarLocation("lightColour[" + i +"]");
 			location_attenuation[i] = super.getUniformVarLocation("attenuation[" + i + "]");
@@ -169,7 +164,7 @@ public class TerrainShader extends ShaderProgram {
 	 */
 	public void loadLights( List<Light> lights )
 	{
-		for(int i=0; i<MAX_LIGHTS; i++){
+		for(int i=0; i<MAX_LIGHTS_IN_SHADERS; i++){
 			if(i<lights.size()){
 				// load light position in
 				super.load3DVector(location_lightPosition[i], lights.get(i).getPosition());

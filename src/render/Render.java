@@ -174,11 +174,11 @@ public class Render {
 		
 		// Generate a new renderer
 		this.entityRenderer = new EntityRenderer(displayHelper, this.entityShader,
-				this.pickingShader, this.flatShader, projectionMatrix);
+				this.pickingShader, this.flatShader);
 		
 		// Generate a new terrain renderer
 		this.terrainRenderer = new TerrainRenderer(displayHelper, this.terrainShader,
-				this.flatShader, projectionMatrix);
+				this.flatShader);
 		
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		// Don't draw backwards facing primitives
@@ -308,6 +308,7 @@ public class Render {
 		/* TERRAIN */
 		
 		// Do the same as the entity render cycle
+		
 		terrainShader.start();
 		terrainShader.loadSkyColour(skyColour);
 		terrainShader.loadLights(lights);

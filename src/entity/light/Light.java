@@ -13,7 +13,7 @@ public class Light {
 	
 	private Vector3f position;
 	private Vector3f color;
-	private Vector3f attenuation = new Vector3f(1,0,0);
+	private Vector3f attenuation;
 
 	/**
 	 * @param position
@@ -23,6 +23,7 @@ public class Light {
 	{
 		this.position = position;
 		this.color = color;
+		this.attenuation = new Vector3f(1,0,0);
 	}
 	
 	/**
@@ -59,6 +60,8 @@ public class Light {
 	public void setPosition( Vector3f position )
 	{
 		this.position = position;
+		
+		//System.out.println("Updated position");
 	}
 
 	/**
