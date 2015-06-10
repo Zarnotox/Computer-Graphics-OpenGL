@@ -19,6 +19,7 @@ import loader.OBJLoader;
 import math.RayCaster;
 import math.vector.Vector3f;
 
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWCharCallback;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
@@ -206,6 +207,9 @@ public class OpenGLStart {
 		// Run the loop
 		loop();
 		
+		// Destroy the pickengine
+		pickEngine.cleanup();
+		
 		// Release all resources
 		glfwDestroyWindow(windowHelper.getHandle());
 		releaseInputHandlers();
@@ -278,7 +282,7 @@ public class OpenGLStart {
 		Model dragonModel = OBJLoader.loadObjModel("res/dragon.obj", loader);
 		// Load the texture
 		ModelTexture dragonTexture = new ModelTexture(
-				loader.loadTexture("res/squareTexture_flatColour.png")); // trans_test.png
+				loader.loadTexture("res/squareTexture_flatColour.png"), 2); // trans_test.png
 		// Link model and texture
 		TexturedModel dragonTexturedModel = new TexturedModel(dragonModel, dragonTexture);
 		
@@ -287,8 +291,10 @@ public class OpenGLStart {
 		dragonTexture.setReflectivity(1);
 		
 		// Generate an entity from the model and texture
-		Entity dragonEntity1 = new Entity(dragonTexturedModel, new Vector3f(-10, 0, -15),
+		Entity dragonEntity1 = new Entity(dragonTexturedModel, 1, new Vector3f(-10, 0, -15),
 				0, 0, 0, 1);
+		System.out.println("Texture coord: " + dragonEntity1.getTextureXOffset() + "-" + dragonEntity1.getTextureYOffset());
+		
 		// Add the entity to the entity list
 		entityList.add(dragonEntity1);
 		// Add callback
@@ -297,15 +303,16 @@ public class OpenGLStart {
 			@Override
 			public void doAction( Entity thisEntity )
 			{
-				//System.out.println("Dragon entity 1");
+				// System.out.println("Dragon entity 1");
 				
 				thisEntity.increaseRotation(0, 5, 0);
+				thisEntity.nextTexture();
 				
 			}
 		});
 		
 		// Generate an entity from the model and texture
-		Entity dragonEntity2 = new Entity(dragonTexturedModel, new Vector3f(10, 0, -15),
+		Entity dragonEntity2 = new Entity(dragonTexturedModel, 2, new Vector3f(10, 0, -15),
 				0, 0, 0, 1);
 		// Add the entity to the entity list
 		entityList.add(dragonEntity2);
@@ -315,7 +322,7 @@ public class OpenGLStart {
 			@Override
 			public void doAction( Entity thisEntity )
 			{
-				//System.out.println("Dragon entity 2");
+				// System.out.println("Dragon entity 2");
 				
 				thisEntity.increaseRotation(0, -5, 0);
 				
@@ -323,7 +330,7 @@ public class OpenGLStart {
 		});
 		
 		// Generate an entity from the model and texture
-		Entity dragonEntity3 = new Entity(dragonTexturedModel, new Vector3f(-5, 0, -25),
+		Entity dragonEntity3 = new Entity(dragonTexturedModel, 3, new Vector3f(-5, 0, -25),
 				0, 0, 30, 1);
 		// Add the entity to the entity list
 		entityList.add(dragonEntity3);
@@ -333,7 +340,7 @@ public class OpenGLStart {
 			@Override
 			public void doAction( Entity thisEntity )
 			{
-				//System.out.println("Dragon entity 3");
+				// System.out.println("Dragon entity 3");
 				
 				thisEntity.increaseRotation(0, 0, 5);
 				
@@ -344,9 +351,8 @@ public class OpenGLStart {
 		// Create the model
 		Model boxModel = OBJLoader.loadObjModel("res/rectangle.obj", loader);
 		// Load the texture
-		// ModelTexture boxTexture = new
-		// ModelTexture(loader.loadTexture("res/trans_test.png")); // trans_test.png
-		ModelTexture boxTexture = new ModelTexture(PickingEngine.getPickingTextureID());
+		ModelTexture boxTexture = new ModelTexture(loader.loadTexture("res/trans_test.png")); // trans_test.png
+		//ModelTexture boxTexture = new ModelTexture(PickingEngine.getPickingTextureID());
 		boxTexture.setHasTransparency(true);
 		boxTexture.setUseFakeLighting(true);
 		// Link model and texture
@@ -359,7 +365,7 @@ public class OpenGLStart {
 			@Override
 			public void doAction( Entity thisEntity )
 			{
-				//System.out.println("BOX clicked");
+				// System.out.println("BOX clicked");
 				
 				thisEntity.increaseRotation(0, 5f, 0);
 			}
@@ -368,7 +374,7 @@ public class OpenGLStart {
 		/* TERRAINS */
 		// Load grass terrain texture
 		ModelTexture terrainTexture = new ModelTexture(
-				loader.loadTexture("res/squareTexture_flatColour.png"));
+				loader.loadTexture("res/squareTexture_flatColour.png"), 2);
 		// Generate new terrain
 		Terrain terrain = new Terrain(-1, -1, loader, terrainTexture);
 		Terrain terrain2 = new Terrain(0, -1, loader, terrainTexture);
@@ -376,10 +382,12 @@ public class OpenGLStart {
 		Terrain terrain4 = new Terrain(0, 0, loader, terrainTexture);
 		
 		// Add the terrain to the list
+		/*
 		terrainList.add(terrain);
 		terrainList.add(terrain2);
 		terrainList.add(terrain3);
 		terrainList.add(terrain4);
+		*/
 		
 		// Set sky colour
 		Vector3f sky = new Vector3f(0.4f, 0.1f, 0.2f);
@@ -388,9 +396,28 @@ public class OpenGLStart {
 		
 		// Fetch window handle
 		long windowHandle = windowHelper.getHandle();
+		// Variable that holds the last frameTime
+		double lastTime = GLFW.glfwGetTime();
 		// Loop till the user wants to close the window
 		while (glfwWindowShouldClose(windowHandle) == GL_FALSE)
 		{
+			// Update the window timer
+			DisplayHelper.calculateCurrentTime();
+			
+			// Check if the time difference is bigger than 1 second
+			if ( GLFW.glfwGetTime() - lastTime > 1 )
+			{
+				// Calculate the FPS
+				double frametime = DisplayHelper.getFrameTimeInSeconds();
+				
+				// Set the title with frameTime, every second
+				GLFW.glfwSetWindowTitle(windowHandle, String.format("FrameTime: %.4f",
+						frametime));
+				
+				// Save this time
+				lastTime = GLFW.glfwGetTime();
+			}
+			
 			// Fetch the active entity buffer
 			Map<TexturedModel, List<Entity>> entityBuffer = res.getActiveEntityBuffer();
 			// Clear the buffer

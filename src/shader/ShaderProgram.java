@@ -12,6 +12,7 @@ import java.util.List;
 
 import loader.Loader;
 import math.matrix.Matrix4f;
+import math.vector.Vector2f;
 import math.vector.Vector3f;
 
 import org.lwjgl.BufferUtils;
@@ -210,14 +211,25 @@ public abstract class ShaderProgram {
 	}
 	
 	/**
-	 * Load a vector into a uniform variable
+	 * Load a 3D vector into a uniform variable
 	 * 
 	 * @param location
 	 * @param vector
 	 */
-	protected void loadVector( int location, Vector3f vector )
+	protected void load3DVector( int location, Vector3f vector )
 	{
 		GL20.glUniform3f(location, vector.getX(), vector.getY(), vector.getZ());
+	}
+	
+	/**
+	 * Load a 2D vector into a uniform variable
+	 * 
+	 * @param location
+	 * @param vector
+	 */
+	protected void load2DVector( int location, Vector2f vector )
+	{
+		GL20.glUniform2f(location, vector.getX(), vector.getY());
 	}
 	
 	/**

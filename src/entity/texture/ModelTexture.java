@@ -33,17 +33,42 @@ public class ModelTexture {
 	 * The flag indicating that the texture needs to be more evenly lit
 	 */
 	private boolean useFakeLighting;
+	
+	/**
+	 * The amount of rows defined in the textureAtlas
+	 */
+	private int numberOfTextureRows;
 
 	/**
 	 * @param textureID
 	 */
 	public ModelTexture( int textureID )
 	{
-		super();
 		this.textureID = textureID;
 		
 		this.shineDamper = 1;
 		this.reflectivity = 0;
+		// Default to only one texture per texture file
+		this.numberOfTextureRows = 1;
+		
+		this.hasTransparency = false;
+		this.useFakeLighting = false;
+		
+	}
+	
+	/**
+	 * 
+	 * @param textureID
+	 * @param numberOfTextureRows
+	 */
+	public ModelTexture( int textureID, int numberOfTextureRows )
+	{
+		this.textureID = textureID;
+		
+		this.shineDamper = 1;
+		this.reflectivity = 0;
+		// Default to only one texture per texture file
+		this.numberOfTextureRows = numberOfTextureRows;
 		
 		this.hasTransparency = false;
 		this.useFakeLighting = false;
@@ -121,8 +146,12 @@ public class ModelTexture {
 	{
 		this.useFakeLighting = useFakeLighting;
 	}
-	
-	
-	
-	
+
+	/**
+	 * @return the numberOfTextureRows
+	 */
+	public int getNumberOfTextureRows()
+	{
+		return this.numberOfTextureRows;
+	}	
 }

@@ -8,6 +8,7 @@ import entity.light.Light;
 import loader.Loader;
 import math.Maths;
 import math.matrix.Matrix4f;
+import math.vector.Vector2f;
 import math.vector.Vector3f;
 import render.Render;
 
@@ -77,6 +78,16 @@ public class StaticShader extends ShaderProgram {
 	private int location_skyColour;
 	
 	/**
+	 * The location of the shader variable wireframe
+	 */
+	private int location_numberOfTextureRows;
+	
+	/**
+	 * The location of the shader variable skycolour
+	 */
+	private int location_texOffset;
+	
+	/**
 	 * Constructor
 	 */
 	public StaticShader( Loader loader )
@@ -118,6 +129,8 @@ public class StaticShader extends ShaderProgram {
 		location_useFakeLighting = super.getUniformVarLocation("useFakeLighting");
 		location_wireframe = super.getUniformVarLocation("wireframe");
 		location_skyColour = super.getUniformVarLocation("skyColour");
+		location_numberOfTextureRows = super.getUniformVarLocation("numberOfTextureRows");
+		location_texOffset = super.getUniformVarLocation("texOffset");
 	}
 	
 	/**
@@ -148,7 +161,7 @@ public class StaticShader extends ShaderProgram {
 	public void loadviewMatrix( Camera camera )
 	{
 		// Generate the viewmatrix based on the camera
-		//Matrix4f matrix = Maths.createViewMatrix(camera);
+		// Matrix4f matrix = Maths.createViewMatrix(camera);
 		// Store the viewmatrix
 		super.loadMatrix(location_viewMatrix, camera.getViewMatrix());
 	}
@@ -161,9 +174,9 @@ public class StaticShader extends ShaderProgram {
 	public void loadLight( Light light )
 	{
 		// Load the position of the light
-		super.loadVector(location_lightPosition, light.getPosition());
+		super.load3DVector(location_lightPosition, light.getPosition());
 		// Load the colour of the light
-		super.loadVector(location_lightColour, light.getColor());
+		super.load3DVector(location_lightColour, light.getColor());
 	}
 	
 	/**
@@ -182,29 +195,59 @@ public class StaticShader extends ShaderProgram {
 	
 	/**
 	 * Tell the shader to apply a fake light
+	 * 
 	 * @param useFakeLighting
 	 */
-	public void loadFakeLightingVariable(boolean useFakeLighting) {
+	public void loadFakeLightingVariable( boolean useFakeLighting )
+	{
 		// Load the variable into the shade
 		super.loadBoolean(location_useFakeLighting, useFakeLighting);
 	}
 	
 	/**
 	 * Tell the shader to render in wireframe mode
+	 * 
 	 * @param wireframe
 	 */
-	public void loadWireframeVariable(boolean wireframe) {
+	public void loadWireframeVariable( boolean wireframe )
+	{
 		// Load the var
 		super.loadBoolean(location_wireframe, wireframe);
 	}
 	
 	/**
 	 * Add a sky colour to the shader
+	 * 
 	 * @param sky
 	 */
-	public void loadSkyColour(Vector3f sky) {
+	public void loadSkyColour( Vector3f sky )
+	{
 		// Load the var
-		super.loadVector(location_skyColour, sky);
+		super.load3DVector(location_skyColour, sky);
+	}
+	
+	/**
+	 * Load the number of texture rows present in the texture
+	 * 
+	 * @param rows
+	 */
+	public void loadNumberOfTextureRows( int rows )
+	{
+		//System.out.println("Number of texture rows loaded");
+		super.loadFloat(location_numberOfTextureRows, rows);
+	}
+	
+	/**
+	 * Load the target texture coordinates offset
+	 * 
+	 * @param x
+	 * @param y
+	 */
+	public void loadTextureOffset( float x, float y )
+	{
+		super.load2DVector(location_texOffset, new Vector2f(x, y));
+		
+		//System.out.println("Loading texture offset: " + x + "x" + y);
 	}
 	
 }

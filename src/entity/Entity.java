@@ -43,6 +43,11 @@ public class Entity {
 	private float scale;
 	
 	/**
+	 * The index of the texture for this entity
+	 */
+	private int textureIndex;
+	
+	/**
 	 * The callback that handles actions on this entity
 	 */
 	private EntityActionCallback callback;
@@ -62,12 +67,42 @@ public class Entity {
 			float rotationZ,
 			float scale )
 	{
+		// Default to the first texture
+		this.textureIndex = 0;
+		
 		this.model = model;
 		this.position = position;
 		this.rotationX = rotationX;
 		this.rotationY = rotationY;
 		this.rotationZ = rotationZ;
 		this.scale = scale;
+	}
+	
+	/**
+	 * @param model
+	 * @param textureIndex
+	 * @param position
+	 * @param rotationX
+	 * @param rotationY
+	 * @param rotationZ
+	 * @param scale
+	 */
+	public Entity( TexturedModel model,
+			int textureIndex,
+			Vector3f position,
+			float rotationX,
+			float rotationY,
+			float rotationZ,
+			float scale )
+	{
+		this.model = model;
+		this.position = position;
+		this.rotationX = rotationX;
+		this.rotationY = rotationY;
+		this.rotationZ = rotationZ;
+		this.scale = scale;
+		
+		setTextureIndex(textureIndex);
 	}
 	
 	/**
@@ -213,6 +248,84 @@ public class Entity {
 		{
 			this.callback.doAction(this);
 		}
+	}
+	
+	/**
+	 * @return the textureIndex
+	 */
+	public int getTextureIndex()
+	{
+		return this.textureIndex;
+	}
+	
+	/**
+	 * @param textureIndex the textureIndex to set
+	 */
+	public void setTextureIndex( int textureIndex )
+	{
+		int maxTextures = model.getTexture().getNumberOfTextureRows();
+		maxTextures = (int) Math.pow(maxTextures, maxTextures) - 1;
+		
+		// Check if the index is within 0 and the maximum amount
+		if ( textureIndex < 0 )
+		{
+			textureIndex = 0;
+		}
+		else if ( textureIndex > maxTextures )
+		{
+			textureIndex = maxTextures;
+		}
+		
+		this.textureIndex = textureIndex;
+	}
+	
+	/**
+	 * Toggle the next texture
+	 */
+	public void nextTexture()
+	{
+		int maxTextures = model.getTexture().getNumberOfTextureRows();
+		maxTextures = (int) Math.pow(maxTextures, maxTextures) - 1;
+		
+		// Check if the index is within 0 and the maximum amount
+		if ( textureIndex >= maxTextures )
+		{
+			textureIndex = 0;
+		}
+		else
+		{
+			textureIndex++;
+		}
+	}
+	
+	/**
+	 * Gets the top left X coordinate from the targetTexture
+	 * 
+	 * @return
+	 */
+	public float getTextureXOffset()
+	{
+		// Get the number of texture rows
+		int numTexRows = model.getTexture().getNumberOfTextureRows();
+		// Calculate the target column
+		int column = textureIndex % numTexRows;
+		// Calculate the X coord offset
+		return (float) column / (float) numTexRows;
+	}
+	
+	/**
+	 * Returns the top left Y coordinate from the targetTexture
+	 * 
+	 * @return
+	 */
+	public float getTextureYOffset()
+	{
+		// Get the number of texture rows
+		int numTexRows = model.getTexture().getNumberOfTextureRows();
+		// Calculate the target row
+		int row = textureIndex / numTexRows;
+		// Calculate the X coord offset
+		return (float) row / (float) numTexRows;
 	}
 	
 }

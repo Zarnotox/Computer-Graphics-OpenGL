@@ -32,6 +32,9 @@ uniform mat4 viewMatrix;
 uniform vec3 lightPosition;
 uniform float useFakeLighting;
 
+uniform float numberOfTextureRows;
+uniform vec2 texOffset;
+
 void main(void) {
 	
 	// Calculate the transformed location of this vertec
@@ -44,7 +47,8 @@ void main(void) {
 	gl_Position = projectionMatrix * positionRelativeToCam;
 	
 	// Lineair assign vertex coords to texture coords
-	pass_textureCoords = textureCoords;
+	// The texture coords are gotten from the texture atlas
+	pass_textureCoords = (textureCoords / numberOfTextureRows) + texOffset;
 	
 	// Copy the normal of this vertex
 	vec3 actualNormal = normal;

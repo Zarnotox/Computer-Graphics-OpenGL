@@ -131,8 +131,8 @@ public class FlatShader extends ShaderProgram {
 	public void loadLight( Light light )
 	{
 		// Load the position of the light
-		super.loadVector(location_lightPosition, light.getPosition());
+		super.load3DVector(location_lightPosition, light.getPosition());
 		// Load the colour of the light
-		super.loadVector(location_lightColour, light.getColor());
+		super.load3DVector(location_lightColour, light.getColor());
 	}	
 }

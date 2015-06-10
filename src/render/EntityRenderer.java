@@ -172,6 +172,8 @@ public class EntityRenderer {
 		
 		// Get the texture
 		ModelTexture texture = model.getTexture();
+		// Load targetting texture stuff
+		stShader.loadNumberOfTextureRows(texture.getNumberOfTextureRows());
 		
 		// Check for transparent texture
 		if ( texture.isHasTransparency() )
@@ -226,6 +228,11 @@ public class EntityRenderer {
 				entity.getRotationZ(), entity.getScale());
 		// Load that matrix into the shader
 		stShader.loadTransformationMatrix(transformationMatrix);
+		
+		// Load the picked texture coord offsets
+		float x = entity.getTextureXOffset();
+		float y = entity.getTextureYOffset();
+		stShader.loadTextureOffset(x, y);
 	}
 	
 	/**
