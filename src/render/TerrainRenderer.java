@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import entity.model.Model;
+import entity.terrain.Terrain;
 import entity.texture.ModelTexture;
 import glStart.DisplayHelper;
 import math.Maths;
@@ -18,7 +19,6 @@ import math.matrix.Matrix4f;
 import math.vector.Vector3f;
 import shader.FlatShader;
 import shader.TerrainShader;
-import terrain.Terrain;
 
 /**
  * @author Bert

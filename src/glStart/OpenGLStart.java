@@ -30,7 +30,6 @@ import org.lwjgl.opengl.GLContext;
 
 import picking.PickingEngine;
 import render.Render;
-import terrain.Terrain;
 import callbacks.CharHandler;
 import callbacks.EntityActionCallback;
 import callbacks.KeyHandler;
@@ -41,6 +40,7 @@ import entity.Entity;
 import entity.light.Light;
 import entity.model.Model;
 import entity.model.TexturedModel;
+import entity.terrain.Terrain;
 import entity.texture.ModelTexture;
 
 /**

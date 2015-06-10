@@ -315,6 +315,8 @@ public class Camera {
 		this.horizontalAngle = -yaw;
 		this.verticalAngle = -pitch;
 		
+		updateViewMatrix();
+		
 		// Recalculate the targetPoint
 		calculateTargetPoint();
 	}

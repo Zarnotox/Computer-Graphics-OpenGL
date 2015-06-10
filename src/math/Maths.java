@@ -3,6 +3,8 @@
  */
 package math;
 
+import java.awt.Dimension;
+
 import camera.Camera;
 import math.matrix.Matrix4f;
 import math.vector.Vector3f;
@@ -75,5 +77,36 @@ public class Maths {
 		
 		// Return the view matrix
 		//return targetMatrix;
+	}
+	
+	/**
+	 * Generate a projectionMatrix.
+	 * The projectionMatrix makes the objects onscreen more realistic looking
+	 */
+	public static Matrix4f createProjectionMatrix( Dimension d, float fov, float farPlaneDist, float nearPlaneDist)
+	{		
+		/* DEBUG */
+		// System.out.println("Calculating projection matrix");
+		// System.out.println("WindowDimensions: " + d.toString());
+		
+		// Prepare matrix variables
+		float aspectRatio = (float) d.getWidth() / (float) d.getHeight();
+		float y_scale = (float) (1f / Math.tan(Math.toRadians(fov / 2f)) * aspectRatio);
+		float x_scale = y_scale / aspectRatio;
+		float frustum_length = farPlaneDist - nearPlaneDist;
+		
+		// Generate the projection matrix
+		Matrix4f projectionMatrix = new Matrix4f();
+		projectionMatrix.m00 = x_scale;
+		projectionMatrix.m11 = y_scale;
+		projectionMatrix.m22 = -((farPlaneDist + nearPlaneDist) / frustum_length);
+		projectionMatrix.m23 = -1;
+		projectionMatrix.m32 = -((2 * nearPlaneDist * farPlaneDist) / frustum_length);
+		projectionMatrix.m33 = 0;
+		
+		/* DEBUG */
+		System.out.println(projectionMatrix.toString());
+		
+		return projectionMatrix;
 	}
 }

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package terrain;
+package entity.terrain;
 
 import loader.Loader;
 import entity.model.Model;

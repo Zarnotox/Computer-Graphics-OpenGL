@@ -24,15 +24,16 @@ import camera.Camera;
 import entity.Entity;
 import entity.light.Light;
 import entity.model.TexturedModel;
+import entity.terrain.Terrain;
 import glStart.DisplayHelper;
 import glStart.RenderResources;
 import loader.Loader;
+import math.Maths;
 import math.matrix.Matrix4f;
 import math.vector.Vector3f;
 import shader.FlatShader;
 import shader.StaticShader;
 import shader.TerrainShader;
-import terrain.Terrain;
 
 /**
  * @author Bert
@@ -474,30 +475,8 @@ public class Render {
 	 */
 	private void createProjectionMatrix()
 	{
-		// Fetch the window dimensions
-		Dimension d = displayHelper.getWindowDimensions();
-		
-		/* DEBUG */
-		// System.out.println("Calculating projection matrix");
-		// System.out.println("WindowDimensions: " + d.toString());
-		
-		// Prepare matrix variables
-		float aspectRatio = (float) d.getWidth() / (float) d.getHeight();
-		float y_scale = (float) (1f / Math.tan(Math.toRadians(FOV / 2f)) * aspectRatio);
-		float x_scale = y_scale / aspectRatio;
-		float frustum_length = FAR_PLANE_DISTANCE - NEAR_PLANE_DISTANCE;
-		
-		// Generate the projection matrix
-		projectionMatrix = new Matrix4f();
-		projectionMatrix.m00 = x_scale;
-		projectionMatrix.m11 = y_scale;
-		projectionMatrix.m22 = -((FAR_PLANE_DISTANCE + NEAR_PLANE_DISTANCE) / frustum_length);
-		projectionMatrix.m23 = -1;
-		projectionMatrix.m32 = -((2 * NEAR_PLANE_DISTANCE * FAR_PLANE_DISTANCE) / frustum_length);
-		projectionMatrix.m33 = 0;
-		
-		/* DEBUG */
-		System.out.println(projectionMatrix.toString());
+		Dimension dim = displayHelper.getWindowDimensions();
+		projectionMatrix = Maths.createProjectionMatrix(dim, FOV, FAR_PLANE_DISTANCE, NEAR_PLANE_DISTANCE);
 	}
 	
 	/**
@@ -518,10 +497,6 @@ public class Render {
 	public Matrix4f getProjectionMatrix()
 	{
 		return projectionMatrix;
-	}
-	
-	private void calculateFPS() {
-		double currentTime = GLFW.glfwGetTime();
 	}
 	
 }
