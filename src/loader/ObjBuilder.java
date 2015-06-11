@@ -11,6 +11,7 @@ import java.util.Map;
 import loader.ObjBuildSystem.Face;
 import loader.ObjBuildSystem.Material;
 import loader.ObjBuildSystem.Vertex;
+import loader.ObjBuildSystem.VertexGroup;
 import loader.owens.BuilderInterface;
 import math.vector.Vector2f;
 import math.vector.Vector3f;
@@ -45,20 +46,35 @@ public class ObjBuilder implements BuilderInterface {
 	 */
 	private List<Vertex> sortedVertexList;
 	
-	 private HashMap<Integer, ArrayList<Vertex>> smoothingGroups;
-	 
-	 private int currentSmoothingGroupNumber = NO_SMOOTHING_GROUP;
-	 
-	 private ArrayList<Vertex> currentSmoothingGroup = null;
-	 
-	    private HashMap<String, ArrayList<Face>> groups = new HashMap<String, ArrayList<Face>>();
-	    private ArrayList<String> currentGroups = new ArrayList<String>();
-	    private ArrayList<ArrayList<Face>> currentGroupFaceLists = new ArrayList<ArrayList<Face>>();
+	private HashMap<Integer, ArrayList<Vertex>> smoothingGroups;
+	private int currentSmoothingGroupNumber = NO_SMOOTHING_GROUP;
+	private ArrayList<Vertex> currentSmoothingGroup = null;
 	
+	/**
+	 * Collection of vertex groups stored by name
+	 */
+	private HashMap<String, ArrayList<VertexGroup>> groupLib;
+	
+	/**
+	 * List of known groupNames
+	 */
+	private ArrayList<String> knownGroupNames;
+	
+	/**
+	 * The list of vertexgroups that is currently active
+	 */
+	private ArrayList<ArrayList<VertexGroup>> currentGroupFaceLists;
+	
+	/**
+	 * The material that's been used for the moment
+	 */
 	private Material currentMaterial;
 	
 	private Material currentMap;
 	
+	/**
+	 * A collection of known materials stored by name
+	 */
 	private Map<String, Material> materialLib;
 	
 	/**
@@ -151,12 +167,15 @@ public class ObjBuilder implements BuilderInterface {
 		Vector2f texCoord = null;
 		Vector3f normVec = null;
 		
+		// Generate a new face object to store the following vertices
+		VertexGroup face = new VertexGroup(currentMaterial, currentMap);
+		
 		// Generate new face from the indices
 		// vertexIndices contains 3 pairs of vertex coords, texture coords and normal
 		// vectors
 		int i = 0;
 		while (i < vertexIndices.length)
-		{			
+		{
 			int compIndex;
 			
 			/* VERTEX COORD */
@@ -237,18 +256,26 @@ public class ObjBuilder implements BuilderInterface {
 					System.err.println("Invalid normal index found!");
 				}
 			}
-		
+			
+			// Get the index of this vertexgroup
+			int index = this.sortedVertexList.size();
+			Vertex v = new Vertex(index, vertexCoord, texCoord, normVec);
+			
+			// Add to the list
+			this.sortedVertexList.add(v);
+			
+			// Add the vertex to the active face
+			face.addvertex(v);
+			
 		} // END OF WHILE
-		if(vertexCoord == null) {
+		if ( vertexCoord == null )
+		{
 			System.err.println("No vertex index found, returning!");
 			return;
 		}
 		
-		// Get the index of this face
-		int index = this.sortedVertexList.size();
-		Vertex v = new Vertex(index, vertexCoord, texCoord, normVec);
-		// Add to the list
-		this.sortedVertexList.add(v);		
+		
+		
 	}
 	
 	/*
