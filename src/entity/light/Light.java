@@ -14,6 +14,10 @@ public class Light {
 	private Vector3f position;
 	private Vector3f color;
 	private Vector3f attenuation;
+	// The backup for the current color
+	private Vector3f colorBackup;
+	// Flag indicating this light is on
+	private boolean on;
 
 	/**
 	 * @param position
@@ -23,7 +27,10 @@ public class Light {
 	{
 		this.position = position;
 		this.color = color;
+		this.colorBackup = color;
 		this.attenuation = new Vector3f(1,0,0);
+		
+		this.on = true;
 	}
 	
 	/**
@@ -35,7 +42,10 @@ public class Light {
 	{
 		this.position = position;
 		this.color = color;
+		this.colorBackup = color;
 		this.attenuation = attenuation;
+		
+		this.on = true;
 	}
 	
 	/**
@@ -78,6 +88,21 @@ public class Light {
 	public void setColor( Vector3f color )
 	{
 		this.color = color;
+		this.colorBackup = color;
+	}
+	
+	/**
+	 * Toggle this light on/off
+	 */
+	public void toggle() {
+		// Toggle
+		this.on = !this.on;
+		
+		if(this.on == true) {
+			this.color = this.colorBackup;
+		} else {
+			this.color = new Vector3f(0,0,0);
+		}
 	}
 	
 		

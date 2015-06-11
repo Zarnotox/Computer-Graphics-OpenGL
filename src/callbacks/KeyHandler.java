@@ -3,10 +3,12 @@
  */
 package callbacks;
 
+import entity.light.Light;
 import glStart.RenderResources;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
+
 import camera.Camera;
 import render.Render;
 
@@ -160,7 +162,14 @@ public class KeyHandler extends GLFWKeyCallback {
 					Render.enableSmoothShading();
 				}
 				
-				break;			
+				break;	
+			case GLFW.GLFW_KEY_F12:
+				// Toggle all lights
+				for(Light l: res.getLightList()) {
+					l.toggle();
+				}
+				
+				break;
 			}
 		}
 	}

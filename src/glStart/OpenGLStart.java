@@ -193,8 +193,8 @@ public class OpenGLStart {
 		res.setPickEngine(pickEngine);
 		
 		/* CAMERAS */
-		// res.addCamera(new MovableCamera(new Vector3f(0, -10, -15), -90, 0, 0));
-		Camera mainCam = new Camera(new Vector3f(0, 25, 10), 45, 0, 0);
+		res.addCamera(new Camera(new Vector3f(5, 2, 0), 0, 0, 0));
+		Camera mainCam = new Camera(new Vector3f(0, 5, 10), 0, 0, 0);
 		res.setActiveCamera(mainCam);
 		
 		/* LIGHTS */
