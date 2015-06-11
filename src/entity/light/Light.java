@@ -18,6 +18,11 @@ public class Light {
 	private Vector3f colorBackup;
 	// Flag indicating this light is on
 	private boolean on;
+	
+	/**
+	 * Flag to indicate this light is allowed to toggle
+	 */
+	private boolean canToggle;
 
 	/**
 	 * @param position
@@ -31,6 +36,7 @@ public class Light {
 		this.attenuation = new Vector3f(1,0,0);
 		
 		this.on = true;
+		this.canToggle = true;
 	}
 	
 	/**
@@ -46,6 +52,7 @@ public class Light {
 		this.attenuation = attenuation;
 		
 		this.on = true;
+		this.canToggle = true;
 	}
 	
 	/**
@@ -95,6 +102,11 @@ public class Light {
 	 * Toggle this light on/off
 	 */
 	public void toggle() {
+		// Check if this light is allowed to toggle
+		if(!this.canToggle) {
+			return;
+		}
+		
 		// Toggle
 		this.on = !this.on;
 		
@@ -103,6 +115,14 @@ public class Light {
 		} else {
 			this.color = new Vector3f(0,0,0);
 		}
+	}
+	
+	/**
+	 * Indicate that this light is allowed to be toggled
+	 * @param toggle
+	 */
+	public void setToggleMode(boolean toggle) {
+		this.canToggle = toggle;
 	}
 	
 		

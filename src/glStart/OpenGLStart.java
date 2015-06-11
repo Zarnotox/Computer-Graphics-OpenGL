@@ -202,6 +202,7 @@ public class OpenGLStart {
 		res.addLight(new Light(new Vector3f(-10, 1, -5), new Vector3f(0.6f, 0.6f, 0.6f), new Vector3f(1, 0.02f, 0.002f)));
 		// Position will be set by the camera
 		Light camLight = new Light(null, new Vector3f(1f, 1f, 1f), new Vector3f(1, 0.08f, 0.002f));
+		camLight.setToggleMode(false);
 		res.addLight(camLight);
 		
 		// Attach the light to the camera
